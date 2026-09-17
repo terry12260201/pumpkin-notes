@@ -457,7 +457,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
   <span class="pn-tools__t">%%STRONG%%</span>
   <div class="pn-tools__r">
     <button class="pn-tbtn" data-act="fav" aria-pressed="false" title="加入我的最愛"><svg><use href="#i-heart"/></svg><span class="pn-tbtn__l">收藏</span></button>
-    <button class="pn-tbtn" data-act="share" title="分享給團隊"><svg><use href="#i-users"/></svg><span class="pn-tbtn__l">分享給團隊</span></button>
+    <button class="pn-tbtn" data-act="share" title="分享給團隊" hidden><svg><use href="#i-users"/></svg><span class="pn-tbtn__l">分享給團隊</span></button>
     <button class="pn-tbtn" data-act="pdf" title="匯出 PDF"><svg><use href="#i-print"/></svg><span class="pn-tbtn__l">匯出 PDF</span></button>
     <button class="pn-tbtn" data-act="md" title="複製 Markdown"><svg><use href="#i-copy"/></svg><span class="pn-tbtn__l">複製 Markdown</span></button>
     <button class="pn-tbtn" data-act="obs" title="下載 Obsidian 包"><svg><use href="#i-download"/></svg><span class="pn-tbtn__l">下載 Obsidian 包</span></button>
@@ -488,7 +488,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
       <div class="pn-mine ig-card">
         <p class="ig-eyebrow">My note · 我的一句話（只有你看得到）</p>
         <textarea id="pn-mine" rows="3" placeholder="讀完想記住的一句話…"></textarea>
-        <p class="ig-small pn-mine__s" id="pn-mine-s">打完點一下外面就會存起來（Phase 1 存在這台電腦的瀏覽器裡）。</p>
+        <p class="ig-small pn-mine__s" id="pn-mine-s">打完點一下外面就會存起來。</p>
       </div>
 %%RELATED%%
       <footer class="pn-foot" data-src="%%SOURCEURL%%">%%FOOTER%%</footer>
@@ -505,11 +505,12 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
       <button class="ig-btn ig-btn--ghost ig-btn--sm" data-close>再想想</button>
       <button class="ig-btn ig-btn--ink ig-btn--sm" id="pn-share-ok">分享給團隊</button>
     </div>
-    <p class="ig-small">Phase 1 先存在這台瀏覽器；Phase 2 接上帳號後才會真的推到團隊共筆。</p>
+    <p class="ig-small" id="pn-share-note">分享之後，夥伴在「團隊共筆」就看得到這篇和你寫的這句話。</p>
   </div>
 </div>
 <div class="toast" id="pn-toast" role="status" aria-live="polite"></div>
 
+<script src="%%UP%%data/config.js"></script>
 <script src="%%UP%%data/reports.js"></script>
 <script src="%%UP%%data/store.js"></script>
 <script>
@@ -534,7 +535,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
 
   function toast(m){var t=document.getElementById('pn-toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on');},2200);}
 
-  /* 收藏 / 分享 狀態 */
+  /* 收藏 / 分享 狀態（跟首頁共用同一套 PN.store：示範模式存瀏覽器，登入後存 Supabase） */
   var favBtn=document.querySelector('[data-act="fav"]'),shareBtn=document.querySelector('[data-act="share"]');
   function paint(){
     if(!S)return;
@@ -542,28 +543,45 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
     favBtn.querySelector('.pn-tbtn__l').textContent=f?'已收藏':'收藏';
     var sh=S.getShare(slug);shareBtn.classList.toggle('is-on',!!sh);
     shareBtn.querySelector('.pn-tbtn__l').textContent=sh?'收回私人':'分享給團隊';
+    /* 只有擁有者（或 owner 還沒認領、owner_email 是自己）才看得到分享鈕 */
+    shareBtn.hidden=!S.canShare(slug);
   }
-  paint();
-  if(S){S.markRead(slug);}
+  if(S){
+    S.ready().then(function(){
+      paint();
+      S.markRead(slug);
+      var m0=document.getElementById('pn-mine');
+      if(m0)m0.value=S.getTakeaway(slug)||'';
+      var s2=document.getElementById('pn-mine-s');
+      if(s2&&S.isOffline())s2.textContent=(PN.mode==='demo'?'示範模式：':'還沒登入：')+'先存在這台電腦的瀏覽器裡。';
+    });
+  }
 
-  favBtn.addEventListener('click',function(){S.toggleFav(slug);paint();toast(S.isFav(slug)?'已加入我的最愛':'已從我的最愛移除');});
+  favBtn.addEventListener('click',function(){
+    Promise.resolve(S.toggleFav(slug)).then(function(on){paint();toast(on?'已加入我的最愛':'已從我的最愛移除');});
+  });
 
   var modal=document.getElementById('pn-share');
   function closeModal(){modal.hidden=true;}
   [].forEach.call(modal.querySelectorAll('[data-close]'),function(b){b.addEventListener('click',closeModal);});
   modal.addEventListener('click',function(e){if(e.target===modal)closeModal();});
   shareBtn.addEventListener('click',function(){
-    if(S.getShare(slug)){S.unshare(slug);paint();toast('已收回成私人筆記');return;}
+    if(S.getShare(slug)){Promise.resolve(S.unshare(slug)).then(function(){paint();toast('已收回成私人筆記');});return;}
     document.getElementById('pn-share-t').value='';modal.hidden=false;document.getElementById('pn-share-t').focus();
   });
   document.getElementById('pn-share-ok').addEventListener('click',function(){
-    S.share(slug,document.getElementById('pn-share-t').value.trim());closeModal();paint();toast('已分享給團隊（示範資料）');
+    Promise.resolve(S.share(slug,document.getElementById('pn-share-t').value.trim())).then(function(){
+      closeModal();paint();toast(S.isOffline()?'已分享給團隊（示範資料）':'已分享給團隊');
+    });
   });
 
-  /* 我的一句話 */
+  /* 我的一句話（只有你看得到） */
   var mine=document.getElementById('pn-mine');
-  if(S){mine.value=S.getTakeaway(slug)||'';}
-  mine.addEventListener('change',function(){S.setTakeaway(slug,mine.value.trim());document.getElementById('pn-mine-s').textContent='已存到這台電腦的瀏覽器。';});
+  mine.addEventListener('change',function(){
+    Promise.resolve(S.setTakeaway(slug,mine.value.trim())).then(function(){
+      document.getElementById('pn-mine-s').textContent=S.isOffline()?'已存到這台電腦的瀏覽器。':'已存起來，只有你看得到。';
+    });
+  });
 
   /* 匯出 PDF：用瀏覽器列印，@media print 已經把工具列、目錄藏起來 */
   document.querySelector('[data-act="pdf"]').addEventListener('click',function(){window.print();});
@@ -871,145 +889,8 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
 """
 
 # ═════════════════════════ 前端資料層 ═════════════════════════
-STORE_JS = r"""/* PN.store — 小南瓜數位筆記的資料層（Phase 1：reports.js ＋ localStorage）
-   ────────────────────────────────────────────────────────────
-   Phase 2 接 Supabase 時，只要把這一支換成 Supabase 版、介面維持一樣，
-   首頁與報告頁的程式碼都不用動：
-     list(q) / get(slug) / create(job) / update(slug,patch)
-     toggleFav(slug) / isFav / markRead(slug) / isRead
-     share(slug,note) / unshare(slug) / getShare(slug)
-     getTakeaway(slug) / setTakeaway(slug,text)
-     jobs() / addJob(job) / patchJob(id,patch)
-     me() / setMe(patch)
-   另外附兩個共用小工具：PN.theme（日夜切換）、PN.dots（互動點格背景）。
-*/
-window.PN = window.PN || {};
-(function () {
-  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe' };
-  function rd(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
-  function wr(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  function D() { return window.PN_DATA || { reports: [], bySlug: {}, shelves: [], tagFamilies: [], profiles: [] }; }
-
-  var store = {
-    /* ── 讀 ── */
-    all: function () { return D().reports.slice(); },
-    get: function (slug) { return D().bySlug[slug] || null; },
-    shelves: function () { return D().shelves; },
-    profiles: function () { return D().profiles; },
-    tagFamilies: function () { return D().tagFamilies; },
-
-    /* ── 我的最愛 ── */
-    favs: function () { return rd(K.fav, []); },
-    isFav: function (s) { return this.favs().indexOf(s) >= 0; },
-    toggleFav: function (s) {
-      var f = this.favs(), i = f.indexOf(s);
-      if (i >= 0) f.splice(i, 1); else f.push(s);
-      wr(K.fav, f); return i < 0;
-    },
-
-    /* ── 已讀 ＋ 我的一句話 ── */
-    reads: function () { return rd(K.read, {}); },
-    isRead: function (s) { return !!this.reads()[s]; },
-    markRead: function (s) {
-      var r = this.reads();
-      r[s] = r[s] || {}; r[s].read_at = new Date().toISOString();
-      wr(K.read, r);
-    },
-    getTakeaway: function (s) { return (this.reads()[s] || {}).my_takeaway || ''; },
-    setTakeaway: function (s, t) {
-      var r = this.reads(); r[s] = r[s] || {}; r[s].my_takeaway = t; wr(K.read, r);
-    },
-
-    /* ── 團隊共筆（Phase 1 是這台瀏覽器的示範狀態） ── */
-    shares: function () { return rd(K.share, {}); },
-    getShare: function (s) { return this.shares()[s] || null; },
-    share: function (s, note) {
-      var h = this.shares();
-      h[s] = { note: note || '', shared_at: new Date().toISOString(), by: this.me().slug };
-      wr(K.share, h);
-    },
-    unshare: function (s) { var h = this.shares(); delete h[s]; wr(K.share, h); },
-
-    /* ── 收件匣排隊單 ── */
-    jobs: function () { return rd(K.jobs, []); },
-    addJob: function (j) {
-      var js = this.jobs();
-      j.id = 'j' + Date.now() + Math.floor(Math.random() * 1000);
-      j.created_at = new Date().toISOString();
-      js.unshift(j); wr(K.jobs, js); return j;
-    },
-    patchJob: function (id, patch) {
-      var js = this.jobs();
-      for (var i = 0; i < js.length; i++) if (js[i].id === id) { for (var k in patch) js[i][k] = patch[k]; }
-      wr(K.jobs, js);
-    },
-    dropJob: function (id) { wr(K.jobs, this.jobs().filter(function (j) { return j.id !== id; })); },
-
-    /* ── 我（Phase 1 固定是南瓜，Phase 2 換成登入帳號） ── */
-    me: function () {
-      var d = D().profiles[0] || { slug: 'terry', name: '南瓜', department: '管理層', title: '共同創辦人／美術總監' };
-      return Object.assign({}, d, rd(K.me, {}));
-    },
-    setMe: function (p) { wr(K.me, Object.assign(rd(K.me, {}), p)); }
-  };
-  PN.store = store;
-
-  /* ── 日／夜切換：兩邊頁面共用 localStorage.pnTheme ── */
-  PN.theme = {
-    get: function () {
-      var t = null; try { t = localStorage.getItem(K.theme); } catch (e) {}
-      return t || (matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day');
-    },
-    set: function (t) {
-      document.body.setAttribute('data-theme', t);
-      try { localStorage.setItem(K.theme, t); } catch (e) {}
-      document.dispatchEvent(new CustomEvent('pn:theme', { detail: t }));
-    },
-    toggle: function () { this.set(this.get() === 'night' ? 'day' : 'night'); },
-    apply: function () { this.set(this.get()); }
-  };
-
-  /* ── 互動點格背景：滑鼠 140px 內的點會變亮變大（不用金色） ── */
-  PN.dots = function (cv) {
-    if (!cv) return;
-    var ctx = cv.getContext('2d'), w = 0, h = 0, dpr = Math.min(devicePixelRatio || 1, 2);
-    var mx = -999, my = -999, R = 140, GAP = 24, raf = 0, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function ink() { return document.body.getAttribute('data-theme') === 'night' ? '255,255,255' : '22,20,21'; }
-    function base() { return document.body.getAttribute('data-theme') === 'night' ? 0.06 : 0.10; }
-    function size() {
-      w = cv.clientWidth; h = cv.clientHeight;
-      cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      draw();
-    }
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-      var c = ink(), b = base();
-      for (var y = GAP / 2; y < h; y += GAP) {
-        for (var x = GAP / 2; x < w; x += GAP) {
-          var a = b, r = 1;
-          if (!still) {
-            var dx = x - mx, dy = y - my, d = Math.sqrt(dx * dx + dy * dy);
-            if (d < R) { var k = 1 - d / R; a = b + (0.45 - b) * k; r = 1 + 0.8 * k; }
-          }
-          ctx.fillStyle = 'rgba(' + c + ',' + a.toFixed(3) + ')';
-          ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
-        }
-      }
-    }
-    function onMove(e) {
-      mx = e.clientX; my = e.clientY;
-      if (!raf) raf = requestAnimationFrame(function () { raf = 0; draw(); });
-    }
-    addEventListener('resize', size);
-    if (!still) {
-      addEventListener('pointermove', onMove, { passive: true });
-      addEventListener('pointerleave', function () { mx = my = -999; draw(); });
-    }
-    document.addEventListener('pn:theme', draw);
-    size();
-  };
-})();
-"""
+# ⚠️ Phase 2 起 data/store.js（雙模式資料層：Supabase ／ 離線示範）改成手維護，
+#    不再由這支產生，這裡也不要再覆蓋它。同理 data/config.js（後端網址與 anon key）。
 
 
 def build_data_js(data, reports, metas, out):
@@ -1118,11 +999,10 @@ def main():
         ok += 1
 
     (HERE / "data").mkdir(exist_ok=True)
-    (HERE / "data/store.js").write_text(STORE_JS, encoding="utf-8")
     n = build_data_js(data, reports, metas, HERE / "data/reports.js")
 
     print(f"✅ V03 產出：報告 {ok} 篇（其中 {added_take} 篇自動補了「三句話帶走」）")
-    print(f"   data/reports.js：{n} 篇｜data/store.js：資料層")
+    print(f"   data/reports.js：{n} 篇｜data/store.js 與 data/config.js 不動（手維護）")
     if skipped:
         print(f"   ⚠️ 略過 {len(skipped)}：{skipped}")
     print(f"   首頁（手寫、不由這支產生）：{HERE / 'index.html'}")

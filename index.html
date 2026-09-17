@@ -459,6 +459,24 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 .app-menu__h{padding:8px 12px 10px;border-bottom:1px solid var(--ig-ink-hairline);margin-bottom:4px}
 .app-menu__h b{display:block;font-size:15px;color:var(--ig-ink)}
 .app-menu__h span{font-size:12.5px;color:var(--ig-ink-soft)}
+.app-menu--login{min-width:268px;padding:10px}
+.lg-b{display:flex!important;align-items:center;justify-content:center;gap:8px;text-align:center!important;
+  border:1px solid var(--ig-ink-hairline)!important;background:var(--ig-card)!important;color:var(--ig-ink)!important;font-weight:500}
+.lg-b:hover{border-color:var(--ig-ink-faint)!important;background:var(--ig-ink-wash)!important}
+.lg-b svg{width:15px;height:15px}
+.lg-or{display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:12px;color:var(--ig-ink-soft)}
+.lg-or i{flex:1;height:1px;background:var(--ig-ink-hairline)}
+.app-menu input,.login__box input{width:100%;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--ig-ink-hairline);
+  background:var(--ig-paper);color:var(--ig-ink);font:400 14px/1 var(--ig-font-sans)}
+.app-menu input:focus,.login__box input:focus,.app-menu input:focus-visible,.login__box input:focus-visible{outline:none;box-shadow:none;border-color:var(--ig-ink)}   /* 金色一畫面只留「新增筆記」那一顆 */
+.lg-msg{padding:6px 12px 2px;margin:0;font-size:12.5px;line-height:1.7;color:var(--ig-ink-soft)}
+.lg-msg.bad{color:var(--ig-ink)}
+.login__box{display:grid;gap:8px;max-width:300px;margin:22px auto 0;text-align:left}
+.login__box .lg-b{width:100%;height:38px;border-radius:999px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border:1px solid var(--ig-ink-hairline);background:var(--ig-card);color:var(--ig-ink);font:500 14px/1 var(--ig-font-sans)}
+.login__box .lg-b:hover{background:var(--ig-ink-wash)}
+.app-hint{margin-top:14px;font-size:13.5px;line-height:1.75;color:var(--ig-ink-soft)}
 
 /* ── 區段骨架 ── */
 .sec{padding:52px 0 0}
@@ -706,23 +724,24 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
   <section class="app-wrap" id="v-library">
     <div class="hero">
       <div>
-        <p class="ig-eyebrow">PUMPKIN LIBRARY</p>
-        <h1 class="hero__t">好內容，值得<span>好好收藏。</span></h1>
-        <p class="hero__lead">把影片變成看得懂、找得到、用得上的圖文筆記。</p>
+        <p class="ig-eyebrow">LIBRARY · 筆記書架</p>
+        <h1 class="hero__t">影片丟進來，<span>重點自己長出來。</span></h1>
+        <p class="hero__lead">貼上 YouTube、課程連結或錄影檔，小南瓜會把它整理成有截圖、有時間戳、有白話辭典的圖文筆記——存進你的第二大腦，也能一鍵分享給南瓜的夥伴。</p>
         <div class="hero__btns">
           <a class="quick-link" href="#inbox"><svg><use href="#i-spark"/></svg><span><b>整理新筆記</b><small>從一支影片，開始累積</small></span><svg class="quick-arrow"><use href="#i-arrow"/></svg></a>
           <a class="quick-link" href="#team"><svg><use href="#i-users"/></svg><span><b>看看夥伴的書架</b><small>分享值得留下的發現</small></span><svg class="quick-arrow"><use href="#i-arrow"/></svg></a>
         </div>
         <div class="stats" id="stats"></div>
+        <p class="app-hint" id="hint" hidden></p>
       </div>
     </div>
-    <div class="directory-head"><h2>瀏覽筆記</h2><label class="search"><svg><use href="#i-search"/></svg><input id="q" type="search" placeholder="搜尋筆記、講者、關鍵字…" aria-label="搜尋筆記"></label></div>
+    <div class="directory-head"><h2>瀏覽筆記</h2><label class="search"><svg><use href="#i-search"/></svg><input id="q" type="search" placeholder="搜標題、講者、辭典詞、章節…" aria-label="搜尋筆記"></label></div>
     <div class="facets">
       <div class="facet"><p class="facet__l">書架</p><div class="ig-pills" id="f-shelf"></div></div>
       <div class="facet"><p class="facet__l">主題</p><div class="ig-pills" id="f-topic"></div></div>
     </div>
 
-    <details class="advanced"><summary><svg><use href="#i-filter"/></svg>進階篩選與排序<span>難度、用途、收藏、閱讀狀態</span></summary><div class="bar" role="toolbar" aria-label="篩選與排序">
+    <details class="advanced" open><summary><svg><use href="#i-filter"/></svg>進階篩選與排序<span>難度、用途、收藏、閱讀狀態</span></summary><div class="bar" role="toolbar" aria-label="篩選與排序">
       <span class="sel" id="w-sort"><select id="s-sort" aria-label="排序">
         <option value="new">最新</option><option value="old">最舊</option>
         <option value="short">最短</option><option value="long">最長</option><option value="fav">最多收藏</option>
@@ -836,8 +855,7 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
       <div class="art"><img src="assets/art/empty-library.png" alt="" loading="lazy"></div>
       <h2>用公司信箱登入</h2>
       <p>只開放 @pumpkinvrar.com 與受邀夥伴。</p>
-      <button class="ig-btn ig-btn--ink" id="login-go">用公司信箱登入</button>
-      <p class="ig-small" style="margin-top:16px">Phase 1 是示範：按下去就當作南瓜本人登入。真的 Google 登入會在 Phase 2 接上 Supabase。</p>
+      <div class="login__box" id="login-box"></div>
     </div>
   </section>
 </main>
@@ -850,6 +868,7 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="data/config.js"></script>
 <script src="data/reports.js"></script>
 <script src="data/store.js"></script>
 <script>
@@ -859,7 +878,17 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
    Phase 2 換 Supabase 時，只要換掉 data/store.js，這支不用動。
    ──────────────────────────────────────────────────────────── */
 (function () {
-  var S = PN.store, D = window.PN_DATA;
+  var S = PN.store;
+  /* D 以前是 window.PN_DATA；現在改成「看著 PN.store 的活視窗」，
+     示範模式讀 reports.js、Supabase 模式讀雲端，下面的畫面程式碼都不用改。 */
+  var D = {
+    get reports() { return S.all(); },
+    get shelves() { return S.shelves(); },
+    get profiles() { return S.profiles(); },
+    get bySlug() { return PN.cache.bySlug; },
+    get tagFamilies() { return S.tagFamilies(); },
+    generated: (window.PN_DATA || {}).generated || ''
+  };
   var PER = 20;                       /* 一頁 20 張 */
   var LEVELS = ['入門', '進階', '深入'];
   var STEPS = ['排隊', '備料', 'AI 寫作', '驗收', '上架'];
@@ -879,18 +908,34 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 
   /* ── 登入（Phase 1 是示範開關；Phase 2 換成 Supabase Auth） ── */
   var auth = {
-    on: function () { try { return localStorage.getItem('pnAuth') !== '0'; } catch (e) { return true; } },
+    live: function () { return PN.auth && PN.auth.live(); },
+    on: function () {
+      if (this.live()) return !!PN.auth.user();
+      try { return localStorage.getItem('pnAuth') !== '0'; } catch (e) { return true; }
+    },
     set: function (v) { try { localStorage.setItem('pnAuth', v ? '1' : '0'); } catch (e) {} }
   };
 
   /* ── Phase 1 的示意夥伴資料：把 12 篇分給 3 個人，讓團隊頁看得出長相 ──
      真的擁有者要等 Phase 2 有帳號才會出現，所以這些列都會標「示意」。 */
   function demoOwner(slug) {
+    if (!S.isOffline()) { var r = S.get(slug); return (r && (r.ownerId || r.ownerEmail)) || ''; }
     var map = {}; try { map = JSON.parse(localStorage.getItem('pnDemoOwner')) || {}; } catch (e) {}
     if (map[slug]) return map[slug];
     return 'terry';
   }
+  /* 卡片與團隊頁要顯示的「擁有者」名字：
+     Supabase 模式 store 已經把 profiles.display_name（或花名冊名）放進 r.owner。 */
+  function ownerOf(r) {
+    if (!S.isOffline()) {
+      return { slug: r.ownerId || r.ownerEmail || '', name: r.owner || '南瓜',
+               department: (S.profiles().filter(function (p) { return p.slug === r.ownerId; })[0] || {}).department || '',
+               title: (S.profiles().filter(function (p) { return p.slug === r.ownerId; })[0] || {}).title || '' };
+    }
+    return profileOf(demoOwner(r.slug));
+  }
   function seedDemo() {
+    if (!S.isOffline() || PN.mode === 'supabase') return;   /* 真資料就不要塞假的 */
     try { if (localStorage.getItem('pnSeeded')) return; } catch (e) { return; }
     var owners = {}, shares = {}, who = ['terry', 'terry', 'blueberry', 'terry', 'walnut', 'terry', 'blueberry', 'terry', 'walnut', 'terry', 'blueberry', 'terry'];
     var notes = ['第 12 分鐘那段把 Harness 講得最清楚。', '做內部工具前先看這篇，省一輪重工。',
@@ -971,15 +1016,16 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     return '<span class="avatar ' + (cls || '') + '">' + esc((p.name || '？').slice(0, 1)) + '</span>';
   }
   function cardHTML(r) {
-    var sh = S.getShare(r.slug), fav = S.isFav(r.slug), p = profileOf(demoOwner(r.slug));
+    var sh = S.getShare(r.slug), fav = S.isFav(r.slug), p = ownerOf(r);
     var topic = (r.tags || []).filter(function(t){return fam(t)==='主題';})[0];
     var marks = {'feng-accounting-dog':'ledger','lin-vibe-to-production':'cube','gao-vibe-or-blindbox':'box','jocelin-harness-piccollage':'layers','leo-company-mcp':'network','zheng-esun-voice-warroom':'wave','hai-ai-self-upgrade':'spark','andrew-wu-service-smarter':'circuit','will-harness-engineering':'compass','ihower-harness-loop-engineering':'loop','limuyue-46-to-90':'pen','hermes-agent-line':'chat'};
     return '<a class="ig-card ig-card--link card' + (fav ? ' is-fav' : '') + (S.isRead(r.slug) ? '' : ' is-unread') + '" href="' + esc(r.file) + '" title="' + esc(r.title) + '">' +
       '<div class="card__cv"><img loading="lazy" src="assets/marks/' + (marks[r.slug] || 'book') + '.svg" alt=""></div><div class="card__b">' +
         '<h3 class="card__t">' + esc(r.title) + '</h3>' +
         '<p class="card__d">' + esc(r.summary) + '</p>' +
-        '<div class="card__f"><span>' + esc(topic ? leaf(topic) : srcLabel(r)) + '</span><span>·</span><span>' + esc(r.readMin) + ' 分閱讀</span>' +
-        (fav ? '<span class="card__fav"><svg><use href="#i-heart"/></svg><span class="sr-only">已收藏</span></span>' : '') + '</div></div></a>';
+        '<div class="card__f"><span class="card__who">' + avatar(p) + '<span>' + esc(p.name) + '</span></span>' +
+        '<span class="card__m"><span>' + esc(topic ? leaf(topic) : srcLabel(r)) + '</span><span>·</span><span>' + esc(r.readMin) + ' 分</span>' +
+        (fav ? '<span class="card__fav"><svg><use href="#i-heart"/></svg><span class="sr-only">已收藏</span></span>' : '') + '</span></div></div></a>';
   }
 
   /* ── 書架頁 ── */
@@ -1068,20 +1114,25 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
   /* ── 團隊頁 ── */
   function renderTeam() {
     var shares = S.shares();
-    var byPerson = {};
-    D.profiles.forEach(function (p) { byPerson[p.slug] = []; });
+    var byPerson = {}, roster = {};
+    D.profiles.forEach(function (p) { byPerson[p.slug] = []; roster[p.slug] = p; });
     D.reports.forEach(function (r) {
       var sh = shares[r.slug]; if (!sh) return;
       var who = sh.by || demoOwner(r.slug);
+      if (!roster[who]) {                      /* 還沒登入過、只有花名冊名字的擁有者 */
+        var o = ownerOf(r);
+        roster[who] = { slug: who, name: o.name, department: o.department || '還沒登入', title: o.title || '' };
+      }
       (byPerson[who] = byPerson[who] || []).push({ r: r, at: sh.shared_at || r.date, note: sh.note });
     });
+    var all = Object.keys(roster).map(function (k) { return roster[k]; });
     var depts = {};
-    D.profiles.forEach(function (p) { depts[p.department] = (depts[p.department] || 0) + 1; });
-    var dh = pill('全部', D.profiles.length, !st.dept, 'data-dept=""');
+    all.forEach(function (p) { depts[p.department] = (depts[p.department] || 0) + 1; });
+    var dh = pill('全部', all.length, !st.dept, 'data-dept=""');
     Object.keys(depts).forEach(function (d) { dh += pill(d, depts[d], st.dept === d, 'data-dept="' + esc(d) + '"'); });
     $('#t-dept').innerHTML = dh;
 
-    var people = D.profiles.filter(function (p) { return !st.dept || p.department === st.dept; });
+    var people = all.filter(function (p) { return !st.dept || p.department === st.dept; });
     var active = people.filter(function (p) { return (byPerson[p.slug] || []).length; });
     var idle = people.filter(function (p) { return !(byPerson[p.slug] || []).length; });
     active.forEach(function (p) { (byPerson[p.slug] || []).sort(function (a, b) { return b.at.localeCompare(a.at); }); });
@@ -1109,7 +1160,7 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     var n = 0, sec = 0, month = new Date().toISOString().slice(0, 7);
     D.reports.forEach(function (r) { if (shares[r.slug]) { n++; sec += r.durationSec; } });
     $('#t-stage').innerHTML = '本月大家讀了 <b>' + n + '</b> 支影片，省下 <b>' + Math.round(sec / 3600) + '</b> 小時。' +
-      '<span class="demo">Phase 1 示意：夥伴與分享是範例資料</span>';
+      (S.isOffline() ? '<span class="demo">示範資料：夥伴與分享是範例</span>' : '');
   }
 
   /* ── 收件匣 ── */
@@ -1131,7 +1182,7 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
         '<button class="app-icbtn" data-drop aria-label="移除這張排隊卡"><svg><use href="#i-x"/></svg></button></div>' +
         '<div class="steps">' + STEPS.map(function (_, i) { return '<i class="' + (i <= j.step ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
         '<div class="steps__l">' + STEPS.map(function (s, i) { return '<span class="' + (i <= j.step ? 'on' : '') + '">' + s + '</span>'; }).join('') + '</div>' +
-        '<p class="job__msg">' + esc(j.step === 0 && j.stalled ? '小南瓜的機器還沒上線，會在下次開機時接手處理。' : STEP_MSG[j.step]) + '</p>' +
+        '<p class="job__msg">' + esc(j.step === 0 && j.stalled ? '小南瓜的機器還沒上線，會在下次開機時接手處理。' : (j.msg || STEP_MSG[j.step])) + '</p>' +
         '</div>';
     }).join('');
     js.forEach(function (j) { if (j.step < 4 && !j.stalled && !timers[j.id]) tick(j.id); });
@@ -1149,12 +1200,21 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     }, 1500);
   }
   function addJob(url, filename) {
+    /* 有接 Supabase 但還沒登入：排隊單沒地方放，先請他登入 */
+    if (auth.live() && !auth.on()) {
+      toast('先登入才排得進收件匣。');
+      var b = $('#btn-login'); if (b) b.click();
+      return Promise.resolve(null);
+    }
     var sel = $('#j-shelf'), shelf = sel.value, name = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
-    var j = S.addJob({ url: url, filename: filename, shelf: shelf, shelfName: name,
-                       level: $('#j-level').value, share: $('#j-share').checked, step: 0 });
-    renderInbox();
-    toast('已排進收件匣（Phase 1 是示範進度，真的產線在 Phase 3）');
-    return j;
+    return Promise.resolve(S.addJob({ url: url, filename: filename, shelf: shelf, shelfName: name,
+                       level: $('#j-level').value, share: $('#j-share').checked, step: 0 }))
+      .then(function (j) {
+        renderInbox();
+        toast(S.isOffline() ? '已排進收件匣（示範進度，真的產線在 Phase 3）'
+                            : '已排進收件匣。小南瓜的機器一上線就會接手。');
+        return j;
+      });
   }
 
   /* ── 我的 ── */
@@ -1170,17 +1230,18 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
         '<label>部門<input id="m-dep" value="' + esc(me.department) + '"></label>' +
         '<label>職稱<input id="m-title" value="' + esc(me.title) + '"></label>' +
         '<label>頭像<input value="' + esc((me.name || '？').slice(0, 1)) + '" disabled></label>' +
-        '</div><p class="ig-small" style="margin-top:14px">Phase 1 只存在這台電腦；Phase 2 會存進 profiles 表，頭像也才能換圖。</p>' +
+        '</div><p class="ig-small" style="margin-top:14px">' + (S.isOffline() ? '示範模式只存在這台電腦；登入後才會存進 profiles 表。' : '會存進 Supabase 的 profiles，團隊頁上大家就看得到。') + '</p>' +
         '<div style="margin-top:16px"><button class="ig-btn ig-btn--ink ig-btn--sm" id="m-save"><svg><use href="#i-check"/></svg>存起來</button></div></div>';
       $('#m-save').onclick = function () {
-        S.setMe({ name: $('#m-name').value.trim() || me.name, department: $('#m-dep').value.trim(), title: $('#m-title').value.trim() });
-        renderNav(); renderMe(); toast('已存到這台電腦的瀏覽器');
+        Promise.resolve(S.setMe({ name: $('#m-name').value.trim() || me.name, department: $('#m-dep').value.trim(), title: $('#m-title').value.trim() }))
+          .then(function () { renderNav(); renderMe(); toast(S.isOffline() ? '已存到這台電腦的瀏覽器' : '已存到你的 profile'); });
       };
     } else {
       var list = D.reports.filter(function (r) {
         if (tab === 'fav') return S.isFav(r.slug);
         if (tab === 'unread') return !S.isRead(r.slug);
-        return demoOwner(r.slug) === me.slug;
+        return demoOwner(r.slug) === me.slug ||
+               (!S.isOffline() && !r.ownerId && r.ownerEmail && r.ownerEmail === (me.email || '').toLowerCase());
       });
       body.innerHTML = '<p class="count">顯示 <b>' + list.length + '</b> 篇</p><div class="grid">' +
         (list.length ? list.map(cardHTML).join('') : '') + '</div>' +
@@ -1223,12 +1284,62 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     toast('已下載索引 Markdown（完整包在 Phase 3）');
   }
 
+  /* ── 登入小框：① Google ② 用公司信箱收一條登入連結 ── */
+  function loginHTML(k, noHead) {
+    var head = noHead ? '' : '__HEAD__';
+    if (!auth.live()) {
+      return head.replace('__HEAD__', '<div class="app-menu__h"><b>用公司信箱登入</b><span>示範模式：data/config.js 還沒填金鑰。</span></div>') +
+        '<button class="lg-b" id="' + k + '-demo"><svg><use href="#i-user"/></svg>先用示範帳號逛逛</button>' +
+        '<p class="lg-msg">填好 anon key 之後，這裡就會變成真的 Google 登入。</p>';
+    }
+    return head.replace('__HEAD__', '<div class="app-menu__h"><b>用公司信箱登入</b><span>只開放 @pumpkinvrar.com 與受邀夥伴。</span></div>') +
+      '<button class="lg-b" id="' + k + '-google"><svg><use href="#i-user"/></svg>用 Google 登入</button>' +
+      '<div class="lg-or"><i></i>或<i></i></div>' +
+      '<input id="' + k + '-mail" type="email" inputmode="email" autocomplete="email" placeholder="you@pumpkinvrar.com">' +
+      '<button class="lg-b" id="' + k + '-link"><svg><use href="#i-inbox"/></svg>寄一條登入連結給我</button>' +
+      '<p class="lg-msg" id="' + k + '-msg"></p>';
+  }
+  function bindLogin(k) {
+    var msg = function (t, bad) { var e = $('#' + k + '-msg'); if (e) { e.textContent = t; e.classList.toggle('bad', !!bad); } };
+    var demo = $('#' + k + '-demo');
+    if (demo) { demo.onclick = function () { auth.set(true); closePop(); renderNav(); location.hash = 'library'; route(); toast('已進入示範帳號（南瓜）'); }; return; }
+    $('#' + k + '-google').onclick = function () {
+      msg('正在跳去 Google…');
+      PN.auth.signInGoogle().catch(function (e) { msg('Google 登入失敗：' + (e.message || e), true); });
+    };
+    var go = function () {
+      var m = ($('#' + k + '-mail').value || '').trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)) { msg('這看起來不是信箱。', true); return; }
+      msg('寄出中…');
+      PN.auth.signInEmail(m).then(function () { msg('已經寄出。去 ' + m + ' 收信，點裡面的連結就登入了。'); },
+        function (e) { msg('寄不出去：' + (e.message || e), true); });
+    };
+    $('#' + k + '-link').onclick = go;
+    $('#' + k + '-mail').onkeydown = function (e) { if (e.key === 'Enter') go(); };
+  }
+  function closePop() { var e = $('#login-pop'); if (e) e.remove(); }
+  function showNotAllowed() {
+    var b = $('#login-box'); if (!b) return;
+    b.innerHTML = '<p class="lg-msg bad">' + esc(PN.auth.notAllowedMsg) + '</p>' +
+      '<button class="lg-b" id="na-out">換一個信箱</button>';
+    $('#na-out').onclick = function () { PN.auth.signOut().then(function () { renderNav(); route(); }); };
+  }
+
   /* ── 導覽列右側 ── */
   function renderNav() {
     var w = $('#me-wrap');
     if (!auth.on()) {
       w.innerHTML = '<button class="ig-btn ig-btn--line ig-btn--sm" id="btn-login"><svg><use href="#i-user"/></svg>登入</button>';
-      $('#btn-login').onclick = function () { show('login'); };
+      $('#btn-login').onclick = function (e) {
+        e.stopPropagation();
+        if ($('#login-pop')) { closePop(); return; }
+        var m = document.createElement('div');
+        m.className = 'app-menu app-menu--login'; m.id = 'login-pop';
+        m.innerHTML = loginHTML('lg');
+        m.onclick = function (ev) { ev.stopPropagation(); };
+        w.appendChild(m); bindLogin('lg');
+        var i = $('#lg-mail'); if (i) i.focus();
+      };
       return;
     }
     var me = S.me();
@@ -1240,10 +1351,22 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
       var m = document.createElement('div');
       m.className = 'app-menu'; m.id = 'me-menu';
       m.innerHTML = '<div class="app-menu__h"><b>' + esc(me.name) + '</b><span>' + esc(me.department) + '／' + esc(me.title) + '</span></div>' +
-        '<a href="#me">我的筆記</a><a href="#me">我的最愛</a><button id="m-out">登出（示範）</button>';
+        '<a href="#me">我的筆記</a><a href="#me">我的最愛</a><button id="m-out">' + (auth.live() ? '登出' : '登出（示範）') + '</button>';
       w.appendChild(m);
-      $('#m-out').onclick = function () { auth.set(false); m.remove(); renderNav(); show('login'); };
+      $('#m-out').onclick = function () {
+        m.remove();
+        if (auth.live()) { PN.auth.signOut().then(function () { renderNav(); location.hash = 'library'; route(); toast('已登出'); }); }
+        else { auth.set(false); renderNav(); show('login'); }
+      };
     };
+  }
+
+  /* 存在 Supabase Storage 的報告，要先跟後端換一個 1 小時的簽名網址 */
+  function openNote(slug) {
+    S.noteUrl(slug).then(function (u) {
+      if (u) location.href = u;
+      else toast('這篇還沒有可以開的檔案。');
+    });
   }
 
   /* ── 切頁 ── */
@@ -1256,11 +1379,25 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
+  function renderHint() {
+    var h = $('#hint');
+    if (auth.live() && S.isOffline()) {
+      h.hidden = false;
+      h.innerHTML = auth.on()
+        ? '連不上雲端，先顯示離線資料。'
+        : '現在看到的是離線的團隊公開筆記。<b>登入後</b>看得到自己的私人筆記與最新的團隊分享。';
+    } else if (!auth.live()) {
+      h.hidden = false;
+      h.textContent = '示範模式：資料來自 data/reports.js，收藏與分享只存在這台瀏覽器。';
+    } else { h.hidden = true; }
+  }
+
   function route() {
     readHash();
+    if (auth.live() && auth.on() && !PN.auth.allowed()) { show('login'); showNotAllowed(); return; }
     if ((st.route === 'me') && !auth.on()) { show('login'); return; }
     show(st.route);
-    if (st.route === 'library') { renderFacets(); renderBar(); renderGrid(); }
+    if (st.route === 'library') { renderHint(); renderFacets(); renderBar(); renderGrid(); }
     if (st.route === 'team') renderTeam();
     if (st.route === 'inbox') renderInbox();
     if (st.route === 'me') renderMe();
@@ -1271,9 +1408,9 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     addEventListener('hashchange', route);
     document.addEventListener('click', function (e) {
       if ($('#me-menu') && !e.target.closest('#me-wrap')) $('#me-menu').remove();
+      if ($('#login-pop') && !e.target.closest('#me-wrap')) closePop();
     });
     $('#theme').onclick = function () { PN.theme.toggle(); };
-    $('#login-go').onclick = function () { auth.set(true); renderNav(); location.hash = 'library'; route(); toast('已登入（示範帳號：南瓜）'); };
 
 
     $('#f-shelf').onclick = function (e) {
@@ -1325,8 +1462,12 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     });
     $('#jobs').onclick = function (e) {
       var card = e.target.closest('[data-job]'); if (!card) return;
-      if (e.target.closest('[data-drop]')) { S.dropJob(card.dataset.job); renderInbox(); return; }
-      if (e.target.closest('[data-open]')) toast('Phase 1 還沒有真的產線；Phase 3 的 worker 接上後，這裡會連到新筆記。');
+      if (e.target.closest('[data-drop]')) { Promise.resolve(S.dropJob(card.dataset.job)).then(renderInbox); return; }
+      if (e.target.closest('[data-open]')) {
+        var jj = S.jobs().filter(function (x) { return x.id === card.dataset.job; })[0];
+        if (jj && jj.noteSlug) { openNote(jj.noteSlug); return; }
+        toast('還沒有真的產線；Phase 3 的 worker 接上後，這裡會連到新筆記。');
+      }
     };
 
     $('#me-tabs').onclick = function (e) { var b = e.target.closest('[data-me]'); if (!b) return; st.me = b.dataset.me; renderMe(); };
@@ -1335,15 +1476,34 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
     document.addEventListener('pn:theme', function () { /* 卡片、插畫靠 CSS 變數自己換色 */ });
   }
 
-  /* ── 起手式 ── */
+  /* ── 起手式：資料層（示範模式或 Supabase）先 ready，再畫畫面 ── */
   try { st.view = localStorage.getItem('pnView') || 'grid'; } catch (e) {}
-  seedDemo();
-  renderStats();
-  renderNav();
-  bind();
-  route();
   PN.dots($('#pn-dots'));
-  $('#foot-gen').textContent = '資料產生於 ' + (D.generated || '');
+  S.ready().then(function () {
+    seedDemo();
+    renderStats();
+    renderNav();
+    bind();
+    if (!auth.live() || !auth.on() || PN.auth.allowed()) { $('#login-box').innerHTML = loginHTML('lg2', true); bindLogin('lg2'); }
+    route();
+    $('#foot-gen').textContent = S.isOffline()
+      ? '資料產生於 ' + (D.generated || '')
+      : '資料來自 Supabase · ' + new Date().toISOString().slice(0, 10);
+
+    if (auth.live()) {
+      /* Google 導回、magic link 點進來、登出 —— 都走這裡重抓一次資料 */
+      PN.auth.onChange(function () {
+        renderNav(); renderStats();
+        if (auth.on() && PN.auth.allowed()) watchJobs();
+        if (!auth.on() || PN.auth.allowed()) { $('#login-box').innerHTML = loginHTML('lg2', true); bindLogin('lg2'); }
+        route();
+      });
+      if (auth.on() && PN.auth.allowed()) watchJobs();
+    }
+  });
+  function watchJobs() {
+    S.watchJobs(function () { if (st.route === 'inbox') renderInbox(); });
+  }
 })();
 
 </script>

@@ -11,7 +11,7 @@
 <style>
 /* ink-gold kit:start */
 /* ==========================================================================
-   🖋️ 南瓜墨金美學 Pumpkin Ink & Gold — CSS Kit v1.0
+   🖋️ 南瓜墨金美學 Pumpkin Ink & Gold — CSS Kit v1.1
    用法：整段貼進 <style>，<body class="ig"> 就生效。
    中文頁面請寫 <html lang="zh-Hant">（標題字距會自動改成中文友善）。
    ========================================================================== */
@@ -47,7 +47,7 @@
   --ig-gold: #FDC302;
   --ig-gold-light: #FFD83A;
   --ig-gold-soft: #FCD94A;   /* 焦點光圈、深底上的 hover 字 */
-  --ig-gold-deep: #B88800;   /* 淺底上的金色文字 */
+  --ig-gold-deep: #8A6400;   /* 淺底上的金色文字 */
   --ig-gold-wash: #FEF3C7;
   --ig-on-gold: #2D2B2C;     /* 金色上面的字：深炭，不是純黑 */
   --ig-gold-gradient: linear-gradient(to top, #FDC302 0%, #FFD83A 100%);
@@ -377,6 +377,36 @@ html[lang^="zh"] .ig-display { line-height: 1.22; }
   .ig-nav { margin: 12px 12px 0; }
   .ig-tool__logo { width: 56px; height: 56px; flex-basis: 56px; }
 }
+
+/* 1.1 · Directory profile — exact content width, quieter hierarchy */
+:root{--ig-w-directory:1200px;--ig-grid-gap:12px;--ig-logo-size:76px;--ig-label-readable:rgba(22,20,21,.64);--ig-focus-ink:rgba(22,20,21,.8);--ig-dot-quiet:rgba(22,20,21,.055)}
+html:has(body.ig),body.ig{overflow-x:clip}
+body.ig.ig-directory{background-image:radial-gradient(var(--ig-dot-quiet) .7px,transparent 1px)}
+.ig-directory .ig-container{max-width:1248px;padding:0 24px}
+.ig-directory .ig-nav{width:calc(100% - 48px);max-width:var(--ig-w-directory);top:24px;margin:24px auto 0}
+.ig-directory .ig-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ig-grid-gap)}
+.ig-directory .ig-tool__logo{width:var(--ig-logo-size);height:var(--ig-logo-size);flex-basis:var(--ig-logo-size)}
+.ig-directory .ig-tool__logo svg{width:40px;height:40px}
+.ig-directory .ig-tool__title{display:block;padding-right:12px;line-height:1.5}
+.ig-directory .ig-tool__desc{line-height:1.6;min-height:3.2em}
+.ig-directory .ig-tool__foot{margin-top:10px}
+.ig-directory .ig-tool__foot .ig-tag{padding:0;background:transparent;font-size:12px;color:var(--ig-label-readable)}
+.ig-directory .ig-card--link:hover{transform:translateY(-1px)}
+.ig-directory .ig-pill__n{color:var(--ig-label-readable)}
+.ig-directory .ig-pill.is-active .ig-pill__n{color:var(--ig-on-night-muted)}
+.ig-directory .ig-tool__arrow{opacity:0}
+.ig-directory .ig-tool:hover .ig-tool__arrow,.ig-directory .ig-tool:focus-visible .ig-tool__arrow{opacity:1}
+.ig-directory .ig-tool__logo[data-tone="文件"]{color:var(--ig-chart-3)}
+.ig-directory .ig-tool__logo[data-tone="設計"]{color:var(--ig-chart-4)}
+.ig-directory .ig-tool__logo[data-tone="影像"]{color:var(--ig-chart-5)}
+.ig-directory .ig-tool__logo[data-tone="自動化"]{color:var(--ig-chart-2)}
+.ig-directory .ig-tool__logo[data-tone="生活"]{color:var(--ig-gold-deep)}
+.ig-directory :focus-visible{outline:2px solid var(--ig-focus-ink);outline-offset:3px;box-shadow:var(--ig-focus)}
+.ig[data-theme="night"]{--ig-label-readable:rgba(247,247,247,.65);--ig-focus-ink:rgba(255,255,255,.8)}
+@media(max-width:1023px){.ig-directory .ig-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.ig-directory .ig-grid{grid-template-columns:minmax(0,1fr)}.ig-directory .ig-container{padding:0 16px}.ig-directory .ig-nav{width:calc(100% - 24px);top:12px;margin-top:12px}.ig-directory .ig-tool__logo{width:64px;height:64px;flex-basis:64px}}
+@media(prefers-reduced-motion:reduce){.ig-card--link:hover,.ig-btn:hover,.ig-tool__arrow{transform:none!important}}
+
 /* ink-gold kit:end */
 
 
@@ -614,7 +644,7 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   <span class="pn-tools__t">從「小玩具」到「真的能給人用」</span>
   <div class="pn-tools__r">
     <button class="pn-tbtn" data-act="fav" aria-pressed="false" title="加入我的最愛"><svg><use href="#i-heart"/></svg><span class="pn-tbtn__l">收藏</span></button>
-    <button class="pn-tbtn" data-act="share" title="分享給團隊"><svg><use href="#i-users"/></svg><span class="pn-tbtn__l">分享給團隊</span></button>
+    <button class="pn-tbtn" data-act="share" title="分享給團隊" hidden><svg><use href="#i-users"/></svg><span class="pn-tbtn__l">分享給團隊</span></button>
     <button class="pn-tbtn" data-act="pdf" title="匯出 PDF"><svg><use href="#i-print"/></svg><span class="pn-tbtn__l">匯出 PDF</span></button>
     <button class="pn-tbtn" data-act="md" title="複製 Markdown"><svg><use href="#i-copy"/></svg><span class="pn-tbtn__l">複製 Markdown</span></button>
     <button class="pn-tbtn" data-act="obs" title="下載 Obsidian 包"><svg><use href="#i-download"/></svg><span class="pn-tbtn__l">下載 Obsidian 包</span></button>
@@ -836,7 +866,7 @@ Vibe Coding 常見的問題是——<b>一個很簡單的功能，硬要用 AI �
       <div class="pn-mine ig-card">
         <p class="ig-eyebrow">My note · 我的一句話（只有你看得到）</p>
         <textarea id="pn-mine" rows="3" placeholder="讀完想記住的一句話…"></textarea>
-        <p class="ig-small pn-mine__s" id="pn-mine-s">打完點一下外面就會存起來（Phase 1 存在這台電腦的瀏覽器裡）。</p>
+        <p class="ig-small pn-mine__s" id="pn-mine-s">打完點一下外面就會存起來。</p>
       </div>
 <div class="pn-related"><p class="ig-eyebrow">Related · 延伸閱讀</p><h2 class="pn-related__h">跟這篇有關的其他筆記</h2><div class="pn-rel-grid"><a class="ig-card ig-card--link pn-rel" href="gao-vibe-or-blindbox.html"><div class="pn-rel__cv"><img loading="lazy" src="../covers/gao-vibe-or-blindbox.jpg" alt=""></div><div class="pn-rel__b"><span class="pn-rel__m">18:03 · 高見龍</span><b>Vibe Coding 是寫程式還是開盲盒</b><span class="pn-rel__w">共同標籤：VibeCoding、建立觀念</span></div></a><a class="ig-card ig-card--link pn-rel" href="andrew-wu-service-smarter.html"><div class="pn-rel__cv"><img loading="lazy" src="../covers/andrew-wu-service-smarter.jpg" alt=""></div><div class="pn-rel__b"><span class="pn-rel__m">1:04:09 · Andrew Wu</span><b>讓你的 Service 偷偷變聰明</b><span class="pn-rel__w">共同標籤：建立觀念</span></div></a><a class="ig-card ig-card--link pn-rel" href="ihower-harness-loop-engineering.html"><div class="pn-rel__cv"><img loading="lazy" src="../covers/ihower-harness-loop-engineering.jpg" alt=""></div><div class="pn-rel__b"><span class="pn-rel__m">1:01:00 · 張文鈿 ihower</span><b>給 Agent 開發者的 Harness + Loop Engineering</b><span class="pn-rel__w">共同標籤：建立觀念</span></div></a></div></div>
       <footer class="pn-foot" data-src="https://live.gaiconf.com/learning/gaiconf2026/942d8288-d024-4bfd-a094-f30f9506b22e">
@@ -856,11 +886,12 @@ Vibe Coding 常見的問題是——<b>一個很簡單的功能，硬要用 AI �
       <button class="ig-btn ig-btn--ghost ig-btn--sm" data-close>再想想</button>
       <button class="ig-btn ig-btn--ink ig-btn--sm" id="pn-share-ok">分享給團隊</button>
     </div>
-    <p class="ig-small">Phase 1 先存在這台瀏覽器；Phase 2 接上帳號後才會真的推到團隊共筆。</p>
+    <p class="ig-small" id="pn-share-note">分享之後，夥伴在「團隊共筆」就看得到這篇和你寫的這句話。</p>
   </div>
 </div>
 <div class="toast" id="pn-toast" role="status" aria-live="polite"></div>
 
+<script src="../data/config.js"></script>
 <script src="../data/reports.js"></script>
 <script src="../data/store.js"></script>
 <script>
@@ -885,7 +916,7 @@ Vibe Coding 常見的問題是——<b>一個很簡單的功能，硬要用 AI �
 
   function toast(m){var t=document.getElementById('pn-toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on');},2200);}
 
-  /* 收藏 / 分享 狀態 */
+  /* 收藏 / 分享 狀態（跟首頁共用同一套 PN.store：示範模式存瀏覽器，登入後存 Supabase） */
   var favBtn=document.querySelector('[data-act="fav"]'),shareBtn=document.querySelector('[data-act="share"]');
   function paint(){
     if(!S)return;
@@ -893,28 +924,45 @@ Vibe Coding 常見的問題是——<b>一個很簡單的功能，硬要用 AI �
     favBtn.querySelector('.pn-tbtn__l').textContent=f?'已收藏':'收藏';
     var sh=S.getShare(slug);shareBtn.classList.toggle('is-on',!!sh);
     shareBtn.querySelector('.pn-tbtn__l').textContent=sh?'收回私人':'分享給團隊';
+    /* 只有擁有者（或 owner 還沒認領、owner_email 是自己）才看得到分享鈕 */
+    shareBtn.hidden=!S.canShare(slug);
   }
-  paint();
-  if(S){S.markRead(slug);}
+  if(S){
+    S.ready().then(function(){
+      paint();
+      S.markRead(slug);
+      var m0=document.getElementById('pn-mine');
+      if(m0)m0.value=S.getTakeaway(slug)||'';
+      var s2=document.getElementById('pn-mine-s');
+      if(s2&&S.isOffline())s2.textContent=(PN.mode==='demo'?'示範模式：':'還沒登入：')+'先存在這台電腦的瀏覽器裡。';
+    });
+  }
 
-  favBtn.addEventListener('click',function(){S.toggleFav(slug);paint();toast(S.isFav(slug)?'已加入我的最愛':'已從我的最愛移除');});
+  favBtn.addEventListener('click',function(){
+    Promise.resolve(S.toggleFav(slug)).then(function(on){paint();toast(on?'已加入我的最愛':'已從我的最愛移除');});
+  });
 
   var modal=document.getElementById('pn-share');
   function closeModal(){modal.hidden=true;}
   [].forEach.call(modal.querySelectorAll('[data-close]'),function(b){b.addEventListener('click',closeModal);});
   modal.addEventListener('click',function(e){if(e.target===modal)closeModal();});
   shareBtn.addEventListener('click',function(){
-    if(S.getShare(slug)){S.unshare(slug);paint();toast('已收回成私人筆記');return;}
+    if(S.getShare(slug)){Promise.resolve(S.unshare(slug)).then(function(){paint();toast('已收回成私人筆記');});return;}
     document.getElementById('pn-share-t').value='';modal.hidden=false;document.getElementById('pn-share-t').focus();
   });
   document.getElementById('pn-share-ok').addEventListener('click',function(){
-    S.share(slug,document.getElementById('pn-share-t').value.trim());closeModal();paint();toast('已分享給團隊（示範資料）');
+    Promise.resolve(S.share(slug,document.getElementById('pn-share-t').value.trim())).then(function(){
+      closeModal();paint();toast(S.isOffline()?'已分享給團隊（示範資料）':'已分享給團隊');
+    });
   });
 
-  /* 我的一句話 */
+  /* 我的一句話（只有你看得到） */
   var mine=document.getElementById('pn-mine');
-  if(S){mine.value=S.getTakeaway(slug)||'';}
-  mine.addEventListener('change',function(){S.setTakeaway(slug,mine.value.trim());document.getElementById('pn-mine-s').textContent='已存到這台電腦的瀏覽器。';});
+  mine.addEventListener('change',function(){
+    Promise.resolve(S.setTakeaway(slug,mine.value.trim())).then(function(){
+      document.getElementById('pn-mine-s').textContent=S.isOffline()?'已存到這台電腦的瀏覽器。':'已存起來，只有你看得到。';
+    });
+  });
 
   /* 匯出 PDF：用瀏覽器列印，@media print 已經把工具列、目錄藏起來 */
   document.querySelector('[data-act="pdf"]').addEventListener('click',function(){window.print();});

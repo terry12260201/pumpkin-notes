@@ -1,0 +1,5 @@
+.DS_Store
+__pycache__/
+_qa/_m.png
+_qa/index_v02_backup.html
+supabase/roster.local.sql

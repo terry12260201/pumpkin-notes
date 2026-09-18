@@ -262,12 +262,14 @@ window.PN = window.PN || {};
     if (!hasKey) { useOffline(false); booted = Promise.resolve(store); return booted; }
     booted = loadLib().then(function () {
       sb = window.supabase.createClient(CFG.url, CFG.anonKey, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit' }  /* implicit：信裡的連結在任何瀏覽器點都能登入 */
       });
       PN.sb = sb;
       return sb.auth.getSession();
     }).then(function (res) {
       C.user = (res && res.data && res.data.session && res.data.session.user) || null;
+      /* 從信件連結進來：網址上的 token 已被讀走，清掉免得被當成路由 */
+      if (/access_token=|refresh_token=|type=(signup|magiclink|recovery)/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + '#library'); } catch (e) { location.hash = 'library'; } }
       return loadAll();
     }).catch(function (e) {
       warn('連不上 Supabase，先用離線資料', e);

@@ -411,7 +411,7 @@ body.ig.ig-directory{background-image:radial-gradient(var(--ig-dot-quiet) .7px,t
 
 
 /* ── 小南瓜數位筆記 V03：報告頁 ── */
-body.pn-report{background-image:none}            /* 點格改用 canvas 畫（會跟著滑鼠亮） */
+body.pn-report{background-image:none;position:relative;isolation:isolate}            /* 點格改用 canvas 畫（會跟著滑鼠亮） */
 #pn-dots{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1}
 .pn-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;pointer-events:none}
 .pn-progress i{display:block;height:100%;width:0;background:var(--ig-gold-gradient);transition:width 80ms linear}
@@ -864,6 +864,16 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   </div>
 </main>
 
+<div class="pn-modal" id="pn-crop" hidden>
+  <div class="pn-modal__box ig-card" role="dialog" aria-modal="true" aria-labelledby="pn-crop-h" style="width:min(560px,100%)">
+    <button class="pn-modal__x" data-close aria-label="關閉"><svg><use href="#i-x"/></svg></button>
+    <h2 id="pn-crop-h">要換成這張封面嗎？</h2>
+    <p class="small" style="margin:6px 0 12px">拖曳圖片調整位置，拉桿放大縮小。框內就是書架上會看到的範圍（16:9）。</p>
+    <canvas id="pn-crop-cv" width="480" height="270" style="width:100%;aspect-ratio:16/9;border-radius:12px;background:#2D2B2C;cursor:grab;touch-action:none;display:block"></canvas>
+    <input id="pn-crop-zoom" type="range" min="1" max="3" step="0.01" value="1" style="width:100%;margin-top:12px" aria-label="放大縮小">
+    <div class="pn-modal__f"><button class="ig-btn ig-btn--sm" data-close>取消</button><button class="ig-btn ig-btn--ink ig-btn--sm" id="pn-crop-ok">確定更換</button></div>
+  </div>
+</div>
 <div class="pn-modal" id="pn-del" hidden>
   <div class="pn-modal__box ig-card" role="dialog" aria-modal="true" aria-labelledby="pn-del-h">
     <button class="pn-modal__x" data-close aria-label="關閉"><svg><use href="#i-x"/></svg></button>
@@ -957,13 +967,40 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   /* 換封面：只有整理者看得到；圖會先縮到 640 寬再存 */
   var cvFile=document.getElementById('pn-cover-file');
   cvBtn.addEventListener('click',function(){cvFile.click();});
-  cvFile.addEventListener('change',function(){
-    var f=cvFile.files[0];if(!f)return;toast('封面處理中…');
-    Promise.resolve(S.setCover(slug,f)).then(function(ok){
-      toast(ok?'封面換好了，書架上會看到新的':'封面沒換成，再試一次');cvFile.value='';
-      if(ok){var r=S.get(slug),ci=document.querySelector('figure.cover img');if(r&&ci&&r.cover)ci.src=r.cover;}
-    });
+  /* 裁切小框：拖曳移動、拉桿縮放，確定後才存 */
+  var cm=document.getElementById('pn-crop'),ccv=document.getElementById('pn-crop-cv'),cz=document.getElementById('pn-crop-zoom'),cctx=ccv.getContext('2d');
+  var cimg=null,cs={z:1,x:0,y:0,drag:null};
+  function cropDraw(){
+    if(!cimg)return;var W=ccv.width,H=ccv.height;cctx.fillStyle='#2D2B2C';cctx.fillRect(0,0,W,H);
+    var base=Math.max(W/cimg.width,H/cimg.height),sc=base*cs.z,w=cimg.width*sc,h=cimg.height*sc;
+    var maxX=Math.max(0,(w-W)/2),maxY=Math.max(0,(h-H)/2);
+    cs.x=Math.max(-maxX,Math.min(maxX,cs.x));cs.y=Math.max(-maxY,Math.min(maxY,cs.y));
+    cctx.drawImage(cimg,(W-w)/2+cs.x,(H-h)/2+cs.y,w,h);
+  }
+  function cropOpen(file){
+    var url=URL.createObjectURL(file);cimg=new Image();
+    cimg.onload=function(){URL.revokeObjectURL(url);cs={z:1,x:0,y:0,drag:null};cz.value=1;cm.hidden=false;cropDraw();};
+    cimg.onerror=function(){toast('讀不了這張圖');};cimg.src=url;
+  }
+  ccv.addEventListener('pointerdown',function(e){cs.drag={x:e.clientX,y:e.clientY,ox:cs.x,oy:cs.y};ccv.setPointerCapture(e.pointerId);ccv.style.cursor='grabbing';});
+  ccv.addEventListener('pointermove',function(e){if(!cs.drag)return;var k=ccv.width/ccv.clientWidth;cs.x=cs.drag.ox+(e.clientX-cs.drag.x)*k;cs.y=cs.drag.oy+(e.clientY-cs.drag.y)*k;cropDraw();});
+  ccv.addEventListener('pointerup',function(){cs.drag=null;ccv.style.cursor='grab';});
+  cz.addEventListener('input',function(){cs.z=parseFloat(cz.value);cropDraw();});
+  [].forEach.call(cm.querySelectorAll('[data-close]'),function(b){b.addEventListener('click',function(){cm.hidden=true;cvFile.value='';});});
+  cm.addEventListener('click',function(e){if(e.target===cm){cm.hidden=true;cvFile.value='';}});
+  document.getElementById('pn-crop-ok').addEventListener('click',function(){
+    var out=document.createElement('canvas');out.width=640;out.height=360;var o=out.getContext('2d');
+    var base=Math.max(640/cimg.width,360/cimg.height),sc=base*cs.z,w=cimg.width*sc,h=cimg.height*sc,k=640/ccv.width;
+    o.fillStyle='#2D2B2C';o.fillRect(0,0,640,360);o.drawImage(cimg,(640-w)/2+cs.x*k,(360-h)/2+cs.y*k,w,h);
+    out.toBlob(function(b){
+      cm.hidden=true;toast('封面儲存中…');
+      Promise.resolve(S.setCover(slug,new File([b],'cover.jpg',{type:'image/jpeg'}))).then(function(ok){
+        toast(ok?(S.isOffline()?'封面換好了（未登入：只存在這台瀏覽器）':'封面換好了，書架上會看到新的'):'封面沒存成，再試一次');cvFile.value='';
+        if(ok){var r=S.get(slug),ci=document.querySelector('figure.cover img');if(r&&ci&&r.cover)ci.src=r.cover;}
+      });
+    },'image/jpeg',0.86);
   });
+  cvFile.addEventListener('change',function(){var f=cvFile.files[0];if(f)cropOpen(f);});
   /* 刪除：先確認，放進垃圾桶後回到「我的 → 垃圾桶」 */
   var dm=document.getElementById('pn-del');
   [].forEach.call(dm.querySelectorAll('[data-close]'),function(b){b.addEventListener('click',function(){dm.hidden=true;});});

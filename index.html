@@ -1002,6 +1002,7 @@ body[data-theme="night"] .card__cv img{filter:none}
   /* ── 路由：#route?key=value ── */
   function readHash() {
     var h = location.hash.replace(/^#/, '') || 'library';
+    if (/access_token=|error=|type=signup|type=magiclink/.test(h)) h = 'library';
     var parts = h.split('?'), route = parts[0] || 'library';
     if (['library', 'team', 'inbox', 'me'].indexOf(route) < 0) route = 'library';
     st.route = route;
@@ -1412,8 +1413,7 @@ body[data-theme="night"] .card__cv img{filter:none}
         '<p class="lg-msg">填好 anon key 之後，這裡就會變成真的 Google 登入。</p>';
     }
     return head.replace('__HEAD__', '<div class="app-menu__h"><b>用公司信箱登入</b><span>只開放 @pumpkinvrar.com 與受邀夥伴。</span></div>') +
-      '<button class="lg-b" id="' + k + '-google"><svg><use href="#i-user"/></svg>用 Google 登入</button>' +
-      '<div class="lg-or"><i></i>或<i></i></div>' +
+      (window.PN_CONFIG && PN_CONFIG.googleEnabled ? '<button class="lg-b" id="' + k + '-google"><svg><use href="#i-user"/></svg>用 Google 登入</button><div class="lg-or"><i></i>或<i></i></div>' : '') +
       '<input id="' + k + '-mail" type="email" inputmode="email" autocomplete="email" placeholder="you@pumpkinvrar.com">' +
       '<button class="lg-b" id="' + k + '-link"><svg><use href="#i-inbox"/></svg>寄一條登入連結給我</button>' +
       '<p class="lg-msg" id="' + k + '-msg"></p>';
@@ -1422,7 +1422,7 @@ body[data-theme="night"] .card__cv img{filter:none}
     var msg = function (t, bad) { var e = $('#' + k + '-msg'); if (e) { e.textContent = t; e.classList.toggle('bad', !!bad); } };
     var demo = $('#' + k + '-demo');
     if (demo) { demo.onclick = function () { auth.set(true); closePop(); renderNav(); location.hash = 'library'; route(); toast('已進入示範帳號（南瓜）'); }; return; }
-    $('#' + k + '-google').onclick = function () {
+    if ($('#' + k + '-google')) $('#' + k + '-google').onclick = function () {
       msg('正在跳去 Google…');
       PN.auth.signInGoogle().catch(function (e) { msg('Google 登入失敗：' + (e.message || e), true); });
     };
@@ -1514,7 +1514,7 @@ body[data-theme="night"] .card__cv img{filter:none}
   function route() {
     readHash();
     if (auth.live() && auth.on() && !PN.auth.allowed()) { show('login'); showNotAllowed(); return; }
-    if ((st.route === 'me') && !auth.on()) { show('login'); return; }
+    if (auth.live() && !auth.on()) { show('login'); return; }
     show(st.route);
     if (st.route === 'library') { renderHint(); renderFacets(); renderBar(); renderGrid(); }
     if (st.route === 'team') renderTeam();

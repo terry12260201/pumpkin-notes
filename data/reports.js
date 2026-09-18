@@ -1,6 +1,6 @@
 /* 這支檔案是 build_v03.py 產的，不要手改。改資料請改 ~/pumpkin-digital-notes/reports.json 再重跑。 */
 window.PN_DATA = {
- "generated": "2026-09-17",
+ "generated": "2026-09-18",
  "site": {
   "title": "🎃 小南瓜數位筆記",
   "tagline": "一支影片 → 一頁看得懂的圖文重點。用書架收好，用標籤找回來。",

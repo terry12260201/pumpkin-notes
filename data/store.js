@@ -23,7 +23,7 @@ window.PN = window.PN || {};
   var sb = null;
   PN.mode = hasKey ? 'supabase' : 'demo';
 
-  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe' };
+  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe', trash: 'pnTrash', cover: 'pnCover' };
   function rd(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function wr(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function D() { return window.PN_DATA || { reports: [], bySlug: {}, shelves: [], tagFamilies: [], profiles: [] }; }
@@ -48,12 +48,27 @@ window.PN = window.PN || {};
     for (var i = 0; i < C.shelves.length; i++) if (C.shelves[i].id === id) return C.shelves[i];
     return { id: id || '', name: id || '未分類', sections: [], n: 0 };
   }
-  function coverUrl(p) {
+  function coverUrl(p, v) {
     if (!p) return '';
-    if (/^https?:/i.test(p)) return p;
+    if (/^(https?:|data:)/i.test(p)) return p;
     if (p.indexOf('covers/') === 0) return p;                        /* 本站靜態封面 */
-    return CFG.url + '/storage/v1/object/public/covers/' + p;        /* Storage 公開桶 */
+    return CFG.url + '/storage/v1/object/public/covers/' + p + (v ? '?v=' + encodeURIComponent(v) : '');  /* Storage 公開桶 */
   }
+  /* 換封面用：把圖縮到 maxW 寬、轉 JPEG，卡片才不會肥 */
+  function shrink(file, maxW, q) {
+    return new Promise(function (res, rej) {
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function () {
+        var w = Math.min(maxW, img.naturalWidth), h = Math.round(img.naturalHeight * w / img.naturalWidth);
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
+        c.toBlob(function (b) { b ? res(b) : rej(new Error('壓不了圖')); }, 'image/jpeg', q);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('讀不了這張圖')); };
+      img.src = url;
+    });
+  }
+  function blobToDataURL(b) { return new Promise(function (res) { var fr = new FileReader(); fr.onload = function () { res(fr.result); }; fr.readAsDataURL(b); }); }
   function staticPath(p) { return (p || '').indexOf('static:') === 0 ? p.slice(7) : ''; }
   function nowISO() { return new Date().toISOString(); }
   function uid() { return C.user ? C.user.id : ''; }
@@ -83,7 +98,8 @@ window.PN = window.PN || {};
       source: n.source_kind || '', sourceUrl: n.source_url || '',
       duration: mmss(n.duration_sec), durationSec: n.duration_sec || 0,
       date: (n.created_at || '').slice(0, 10),
-      summary: n.summary || '', cover: coverUrl(n.cover_path),
+      summary: n.summary || '', cover: coverUrl(n.cover_path, n.updated_at),
+      deletedAt: n.deleted_at || '', deletedBy: n.deleted_by_name || '',
       tags: tags, keywords: kw, glossary: [], headings: [], figs: 0,
       level: n.level || '', readMin: n.read_min || 0,
       ownerId: n.owner_id || '', ownerEmail: (n.owner_email || '').toLowerCase(),
@@ -118,6 +134,10 @@ window.PN = window.PN || {};
     C.shelves = JSON.parse(JSON.stringify(d.shelves || []));
     C.notes = (d.reports || []).filter(function (r) { return !teamOnly || r.visibility === 'team'; })
       .map(function (r) { var c = Object.assign({}, r); c.needUrl = false; c.owner = c.owner || 'terry'; return c; });
+    if (PN.mode === 'demo') {                 /* 示範模式：垃圾桶與自訂封面都在這台瀏覽器 */
+      var tr = rd(K.trash, {}), cv = rd(K.cover, {});
+      C.notes.forEach(function (c) { if (tr[c.slug]) { c.deletedAt = tr[c.slug].at; c.deletedBy = tr[c.slug].by; } if (cv[c.slug]) c.cover = cv[c.slug]; });
+    }
     C.profiles = (d.profiles || []).map(function (p) { return Object.assign({}, p); });
     C.profById = {}; C.profiles.forEach(function (p) { C.profById[p.slug] = p; });
     C.favs = rd(K.fav, []);
@@ -260,7 +280,7 @@ window.PN = window.PN || {};
     isOffline: function () { return C.offline; },
 
     /* ── 讀（同步，全部從快取拿） ── */
-    all: function () { return C.notes.slice(); },
+    all: function () { return C.notes.filter(function (r) { return !r.deletedAt; }); },
     get: function (slug) { return C.bySlug[slug] || (D().bySlug || {})[slug] || null; },
     shelves: function () { return C.shelves; },
     profiles: function () { return C.profiles; },
@@ -281,6 +301,53 @@ window.PN = window.PN || {};
         if (r && r.error) warn('存不了最愛：' + r.error.message);
         return on;
       }, function (e) { warn('存不了最愛', e); return on; });
+    },
+
+    /* ── 垃圾桶（保留 14 天；團隊共筆的話夥伴都能復原） ── */
+    trash: function () {
+      var now = Date.now();
+      return C.notes.filter(function (r) { return !!r.deletedAt; }).map(function (r) {
+        r.daysLeft = Math.max(0, 14 - Math.floor((now - new Date(r.deletedAt).getTime()) / 864e5)); return r;
+      }).filter(function (r) { return r.daysLeft > 0; })
+        .sort(function (a, b) { return (b.deletedAt || '').localeCompare(a.deletedAt || ''); });
+    },
+    canDelete: function (s) { return this.canShare(s); },
+    canRestore: function (s) { var r = C.bySlug[s]; return !!r && (this.canShare(s) || r.visibility === 'team'); },
+    trashNote: function (s) {
+      var r = C.bySlug[s]; if (!r) return Promise.resolve(false);
+      var at = nowISO(), by = (this.me() || {}).name || '我';
+      r.deletedAt = at; r.deletedBy = by;
+      if (!live()) { var t = rd(K.trash, {}); t[s] = { at: at, by: by }; wr(K.trash, t); return Promise.resolve(true); }
+      return Promise.resolve(sb.from('notes').update({ deleted_at: at, deleted_by: uid(), deleted_by_name: by }).eq('slug', s))
+        .then(function (x) { if (x && x.error) { warn('刪不掉：' + x.error.message); r.deletedAt = ''; return false; } return true; },
+          function (e) { warn('刪不掉', e); r.deletedAt = ''; return false; });
+    },
+    restoreNote: function (s) {
+      var r = C.bySlug[s]; if (!r) return Promise.resolve(false);
+      var was = r.deletedAt; r.deletedAt = ''; r.deletedBy = '';
+      if (!live()) { var t = rd(K.trash, {}); delete t[s]; wr(K.trash, t); return Promise.resolve(true); }
+      return Promise.resolve(sb.from('notes').update({ deleted_at: null, deleted_by: null, deleted_by_name: null }).eq('slug', s))
+        .then(function (x) { if (x && x.error) { warn('復原失敗：' + x.error.message); r.deletedAt = was; return false; } return true; },
+          function (e) { warn('復原失敗', e); r.deletedAt = was; return false; });
+    },
+
+    /* ── 自訂封面（整理者可以自己換） ── */
+    setCover: function (s, file) {
+      var r = C.bySlug[s]; if (!r || !file) return Promise.resolve(false);
+      return shrink(file, 640, 0.82).then(function (blob) {
+        if (!live()) {
+          return blobToDataURL(blob).then(function (u) { var c = rd(K.cover, {}); c[s] = u; wr(K.cover, c); r.cover = u; return true; });
+        }
+        var path = uid() + '/' + s + '.jpg';
+        return Promise.resolve(sb.storage.from('covers').upload(path, blob, { upsert: true, contentType: 'image/jpeg' }))
+          .then(function (x) {
+            if (x && x.error) { warn('封面上傳失敗：' + x.error.message); return false; }
+            return Promise.resolve(sb.from('notes').update({ cover_path: path }).eq('slug', s)).then(function (y) {
+              if (y && y.error) { warn('封面存不進筆記：' + y.error.message); return false; }
+              r.cover = coverUrl(path, nowISO()); return true;
+            });
+          });
+      }, function (e) { warn(e.message || '封面處理失敗'); return false; });
     },
 
     /* ── 已讀 ＋ 我的一句話 ── */

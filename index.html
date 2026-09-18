@@ -546,8 +546,8 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 .count b{color:var(--ig-ink);font-family:var(--ig-font-mono);font-weight:500}
 
 /* ── 卡片格 ── */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:14px}
-@media(max-width:1100px){.grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:14px}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}}
 @media(max-width:600px){.grid{grid-template-columns:minmax(0,1fr)}}
 .grid.is-list{grid-template-columns:minmax(0,1fr)}
 .card{position:relative;display:flex;flex-direction:column;padding:0;overflow:hidden}
@@ -561,8 +561,9 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
   border-radius:999px;background:var(--ig-card);color:var(--ig-ink);font:600 11.5px/1 var(--ig-font-sans);border:1px solid var(--ig-ink-hairline)}
 .card__team svg{width:12px;height:12px}
 .card__b{padding:14px 16px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
-.card__t{font-size:15.5px;font-weight:600;line-height:1.5;color:var(--ig-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.card__d{font-size:13px;line-height:1.7;color:var(--ig-ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card__t{font-size:14.5px;font-weight:600;line-height:1.5;color:var(--ig-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card__mark{object-fit:contain!important;padding:26px;background:var(--ig-card-alt)}
+.card__d{font-size:12.5px;line-height:1.65;color:var(--ig-ink-soft);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .card__f{margin-top:auto;padding-top:10px;border-top:1px solid var(--ig-ink-hairline);display:flex;align-items:center;gap:8px;
   font-size:12px;color:var(--ig-ink-soft)}
 .card__who{display:flex;align-items:center;gap:6px;min-width:0}
@@ -580,6 +581,23 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 .grid.is-list .card__b{padding:18px 22px}
 .grid.is-list .card__d{-webkit-line-clamp:3}
 @media(max-width:640px){.grid.is-list .card{flex-direction:column}.grid.is-list .card__cv{width:100%;flex:auto}}
+
+/* 垃圾桶 */
+.trash{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.trash__row{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 16px 12px 12px}
+.trash__cv{aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--ig-card-alt)}
+.trash__cv img{width:100%;height:100%;object-fit:cover;filter:grayscale(.6);opacity:.8}
+.trash__b b{font-size:15px;font-weight:600;color:var(--ig-ink);display:block;line-height:1.5}
+.trash__b p{margin-top:4px;font-size:12.5px;color:var(--ig-ink-soft)}
+.trash__b p b{display:inline;font-size:inherit;color:var(--ig-ink-muted)}
+@media(max-width:640px){.trash__row{grid-template-columns:minmax(0,1fr)}.trash__cv{max-width:160px}}
+/* 確認小框 */
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px;background:rgba(22,20,21,.45);backdrop-filter:blur(3px)}
+.modal[hidden]{display:none}
+.modal__box{width:min(460px,100%);padding:26px 28px 22px}
+.modal__box h3{font-size:19px;font-weight:700;color:var(--ig-ink)}
+.modal__box p{margin-top:8px;font-size:14.5px;line-height:1.75;color:var(--ig-ink-muted)}
+.modal__f{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 
 /* 空狀態 */
 .empty{margin-top:20px;padding:44px 24px;text-align:center;border-radius:var(--ig-r-card);border:1px dashed var(--ig-ink-faint);
@@ -842,6 +860,7 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
         <button class="ig-pill is-active" data-me="mine">我的筆記</button>
         <button class="ig-pill" data-me="fav">我的最愛</button>
         <button class="ig-pill" data-me="unread">還沒讀</button>
+        <button class="ig-pill" data-me="trash">垃圾桶</button>
         <button class="ig-pill" data-me="set">設定</button>
       </div>
       <div id="me-body"></div>
@@ -1018,13 +1037,14 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
   function cardHTML(r) {
     var sh = S.getShare(r.slug), fav = S.isFav(r.slug), p = ownerOf(r);
     var topic = (r.tags || []).filter(function(t){return fam(t)==='主題';})[0];
-    var marks = {'feng-accounting-dog':'ledger','lin-vibe-to-production':'cube','gao-vibe-or-blindbox':'box','jocelin-harness-piccollage':'layers','leo-company-mcp':'network','zheng-esun-voice-warroom':'wave','hai-ai-self-upgrade':'spark','andrew-wu-service-smarter':'circuit','will-harness-engineering':'compass','ihower-harness-loop-engineering':'loop','limuyue-46-to-90':'pen','hermes-agent-line':'chat'};
+    var cv = r.cover ? '<img loading="lazy" src="' + esc(r.cover) + '" alt="">' : '<img loading="lazy" class="card__mark" src="assets/marks/book.svg" alt="">';
     return '<a class="ig-card ig-card--link card' + (fav ? ' is-fav' : '') + (S.isRead(r.slug) ? '' : ' is-unread') + '" href="' + esc(r.file) + '" title="' + esc(r.title) + '">' +
-      '<div class="card__cv"><img loading="lazy" src="assets/marks/' + (marks[r.slug] || 'book') + '.svg" alt=""></div><div class="card__b">' +
+      '<div class="card__cv">' + cv + '<span class="card__pill">' + esc(srcLabel(r)) + (r.level ? '<i></i>' + esc(r.level) : '') + '</span>' +
+      (sh ? '<span class="card__team"><svg><use href="#i-users"/></svg>共筆</span>' : '') + '</div><div class="card__b">' +
         '<h3 class="card__t">' + esc(r.title) + '</h3>' +
         '<p class="card__d">' + esc(r.summary) + '</p>' +
         '<div class="card__f"><span class="card__who">' + avatar(p) + '<span>' + esc(p.name) + '</span></span>' +
-        '<span class="card__m"><span>' + esc(topic ? leaf(topic) : srcLabel(r)) + '</span><span>·</span><span>' + esc(r.readMin) + ' 分</span>' +
+        '<span class="card__m">' + (topic ? '<span>' + esc(leaf(topic)) + '</span><span>·</span>' : '') + '<span>' + esc(r.readMin) + ' 分</span>' +
         (fav ? '<span class="card__fav"><svg><use href="#i-heart"/></svg><span class="sr-only">已收藏</span></span>' : '') + '</span></div></div></a>';
   }
 
@@ -1218,10 +1238,22 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
   }
 
   /* ── 我的 ── */
+  /* 確認小框：回傳 Promise<boolean> */
+  function confirmBox(t, d, ok) {
+    return new Promise(function (res) {
+      var m = $('#confirm'); $('#cf-t').textContent = t; $('#cf-d').textContent = d; $('#cf-ok').textContent = ok || '確定';
+      m.hidden = false;
+      function done(v) { m.hidden = true; $('#cf-ok').onclick = $('#cf-no').onclick = null; m.onclick = null; res(v); }
+      $('#cf-ok').onclick = function () { done(true); };
+      $('#cf-no').onclick = function () { done(false); };
+      m.onclick = function (e) { if (e.target === m) done(false); };
+    });
+  }
+
   function renderMe() {
     var me = S.me(), tab = st.me;
     $$('#me-tabs .ig-pill').forEach(function (b) { b.classList.toggle('is-active', b.dataset.me === tab); });
-    $('#me-h').textContent = { mine: '我的筆記', fav: '我的最愛', unread: '還沒讀', set: '設定' }[tab];
+    $('#me-h').textContent = { mine: '我的筆記', fav: '我的最愛', unread: '還沒讀', trash: '垃圾桶', set: '設定' }[tab];
     var body = $('#me-body');
     if (tab === 'set') {
       body.innerHTML = '<div class="ig-card me-card"><p class="ig-eyebrow">Profile · 個人設定</p>' +
@@ -1236,6 +1268,27 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
         Promise.resolve(S.setMe({ name: $('#m-name').value.trim() || me.name, department: $('#m-dep').value.trim(), title: $('#m-title').value.trim() }))
           .then(function () { renderNav(); renderMe(); toast(S.isOffline() ? '已存到這台電腦的瀏覽器' : '已存到你的 profile'); });
       };
+    } else if (tab === 'trash') {
+      var tl = S.trash();
+      body.innerHTML = '<p class="count">垃圾桶裡有 <b>' + tl.length + '</b> 篇 · 保留 14 天，之後自動清除</p>' +
+        (tl.length ? '<div class="trash">' + tl.map(function (r) {
+          return '<div class="ig-card trash__row"><div class="trash__cv">' + (r.cover ? '<img src="' + esc(r.cover) + '" alt="">' : '') + '</div>' +
+            '<div class="trash__b"><b>' + esc(r.title) + '</b><p>由 <b>' + esc(r.deletedBy || '整理者') + '</b> 於 ' + esc((r.deletedAt || '').slice(0, 10)) + ' 刪除 · 還剩 <b>' + r.daysLeft + '</b> 天' +
+            (r.visibility === 'team' ? ' · 團隊共筆，夥伴都可以復原' : '') + '</p></div>' +
+            (S.canRestore(r.slug) ? '<button class="ig-btn ig-btn--ink ig-btn--sm" data-restore="' + esc(r.slug) + '"><svg><use href="#i-check"/></svg>復原</button>' : '') + '</div>';
+        }).join('') + '</div>' : '<div class="empty"><p>垃圾桶是空的。刪掉的筆記會在這裡放兩週。</p></div>');
+      $$('[data-restore]').forEach(function (b) {
+        b.onclick = function () {
+          var slug = b.dataset.restore, r = S.get(slug) || {};
+          confirmBox('要把這篇放回書架嗎？', '《' + (r.title || '') + '》會回到原本的位置，分享狀態也照舊。', '放回書架').then(function (ok) {
+            if (!ok) return;
+            Promise.resolve(S.restoreNote(slug)).then(function (done) {
+              if (!done) { toast('復原失敗，再試一次'); return; }
+              toast('已放回書架'); renderStats(); renderFacets(); renderMe();
+            });
+          });
+        };
+      });
     } else {
       var list = D.reports.filter(function (r) {
         if (tab === 'fav') return S.isFav(r.slug);
@@ -1478,14 +1531,16 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 
   /* ── 起手式：資料層（示範模式或 Supabase）先 ready，再畫畫面 ── */
   try { st.view = localStorage.getItem('pnView') || 'grid'; } catch (e) {}
-  PN.dots($('#pn-dots'));
+  // Ink & Gold UI owns the shared magnetic dot field.
   S.ready().then(function () {
     seedDemo();
     renderStats();
     renderNav();
     bind();
     if (!auth.live() || !auth.on() || PN.auth.allowed()) { $('#login-box').innerHTML = loginHTML('lg2', true); bindLogin('lg2'); }
+    var fl = null; try { fl = localStorage.getItem('pnFlash'); if (fl) { localStorage.removeItem('pnFlash'); st.me = 'trash'; } } catch (e) {}
     route();
+    if (fl) toast(fl);
     $('#foot-gen').textContent = S.isOffline()
       ? '資料產生於 ' + (D.generated || '')
       : '資料來自 Supabase · ' + new Date().toISOString().slice(0, 10);
@@ -1507,4 +1562,9 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 })();
 
 </script>
+<script src="assets/ink-gold-ui.js" data-theme="external"></script>
+<div class="modal" id="confirm" hidden><div class="modal__box ig-card" role="dialog" aria-modal="true" aria-labelledby="cf-t">
+  <h3 id="cf-t"></h3><p id="cf-d"></p>
+  <div class="modal__f"><button class="ig-btn ig-btn--sm" id="cf-no">先不要</button><button class="ig-btn ig-btn--ink ig-btn--sm" id="cf-ok">確定</button></div>
+</div></div>
 </body></html>

@@ -645,6 +645,9 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   <div class="pn-tools__r">
     <button class="pn-tbtn" data-act="fav" aria-pressed="false" title="加入我的最愛"><svg><use href="#i-heart"/></svg><span class="pn-tbtn__l">收藏</span></button>
     <button class="pn-tbtn" data-act="share" title="分享給團隊" hidden><svg><use href="#i-users"/></svg><span class="pn-tbtn__l">分享給團隊</span></button>
+    <button class="pn-tbtn" data-act="cover" title="換一張封面（只有整理者看得到）" hidden><svg><use href="#i-copy"/></svg><span class="pn-tbtn__l">換封面</span></button>
+    <button class="pn-tbtn" data-act="del" title="放進垃圾桶，兩週內可復原" hidden><svg><use href="#i-x"/></svg><span class="pn-tbtn__l">刪除</span></button>
+    <input type="file" id="pn-cover-file" accept="image/*" hidden>
     <button class="pn-tbtn" data-act="pdf" title="匯出 PDF"><svg><use href="#i-print"/></svg><span class="pn-tbtn__l">匯出 PDF</span></button>
     <button class="pn-tbtn" data-act="md" title="複製 Markdown"><svg><use href="#i-copy"/></svg><span class="pn-tbtn__l">複製 Markdown</span></button>
     <button class="pn-tbtn" data-act="obs" title="下載 Obsidian 包"><svg><use href="#i-download"/></svg><span class="pn-tbtn__l">下載 Obsidian 包</span></button>
@@ -840,6 +843,14 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   </div>
 </main>
 
+<div class="pn-modal" id="pn-del" hidden>
+  <div class="pn-modal__box ig-card" role="dialog" aria-modal="true" aria-labelledby="pn-del-h">
+    <button class="pn-modal__x" data-close aria-label="關閉"><svg><use href="#i-x"/></svg></button>
+    <h2 id="pn-del-h">要把這篇放進垃圾桶嗎？</h2>
+    <p class="small" style="margin-top:8px">會保留 14 天。這段時間你可以在「我的 → 垃圾桶」復原；如果是團隊共筆，夥伴也看得到是誰刪的、也能幫忙復原。</p>
+    <div class="pn-modal__f"><button class="ig-btn ig-btn--sm" data-close>先不要</button><button class="ig-btn ig-btn--ink ig-btn--sm" id="pn-del-ok">放進垃圾桶</button></div>
+  </div>
+</div>
 <div class="pn-modal" id="pn-share" hidden>
   <div class="pn-modal__box ig-card" role="dialog" aria-modal="true" aria-labelledby="pn-share-h">
     <button class="pn-modal__x" data-close aria-label="關閉"><svg><use href="#i-x"/></svg></button>
@@ -880,7 +891,7 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   function toast(m){var t=document.getElementById('pn-toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on');},2200);}
 
   /* 收藏 / 分享 狀態（跟首頁共用同一套 PN.store：示範模式存瀏覽器，登入後存 Supabase） */
-  var favBtn=document.querySelector('[data-act="fav"]'),shareBtn=document.querySelector('[data-act="share"]');
+  var favBtn=document.querySelector('[data-act="fav"]'),shareBtn=document.querySelector('[data-act="share"]'),cvBtn=document.querySelector('[data-act="cover"]'),delBtn=document.querySelector('[data-act="del"]');
   function paint(){
     if(!S)return;
     var f=S.isFav(slug);favBtn.setAttribute('aria-pressed',f?'true':'false');
@@ -889,6 +900,7 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
     shareBtn.querySelector('.pn-tbtn__l').textContent=sh?'收回私人':'分享給團隊';
     /* 只有擁有者（或 owner 還沒認領、owner_email 是自己）才看得到分享鈕 */
     shareBtn.hidden=!S.canShare(slug);
+    cvBtn.hidden=delBtn.hidden=!S.canShare(slug);
   }
   if(S){
     S.ready().then(function(){
@@ -916,6 +928,26 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   document.getElementById('pn-share-ok').addEventListener('click',function(){
     Promise.resolve(S.share(slug,document.getElementById('pn-share-t').value.trim())).then(function(){
       closeModal();paint();toast(S.isOffline()?'已分享給團隊（示範資料）':'已分享給團隊');
+    });
+  });
+
+  /* 換封面：只有整理者看得到；圖會先縮到 640 寬再存 */
+  var cvFile=document.getElementById('pn-cover-file');
+  cvBtn.addEventListener('click',function(){cvFile.click();});
+  cvFile.addEventListener('change',function(){
+    var f=cvFile.files[0];if(!f)return;toast('封面處理中…');
+    Promise.resolve(S.setCover(slug,f)).then(function(ok){toast(ok?'封面換好了，書架上會看到新的':'封面沒換成，再試一次');cvFile.value='';});
+  });
+  /* 刪除：先確認，放進垃圾桶後回到「我的 → 垃圾桶」 */
+  var dm=document.getElementById('pn-del');
+  [].forEach.call(dm.querySelectorAll('[data-close]'),function(b){b.addEventListener('click',function(){dm.hidden=true;});});
+  dm.addEventListener('click',function(e){if(e.target===dm)dm.hidden=true;});
+  delBtn.addEventListener('click',function(){dm.hidden=false;});
+  document.getElementById('pn-del-ok').addEventListener('click',function(){
+    Promise.resolve(S.trashNote(slug)).then(function(ok){
+      if(!ok){dm.hidden=true;toast('刪不掉，再試一次');return;}
+      try{localStorage.setItem('pnFlash','已放進垃圾桶，兩週內都可以復原。');}catch(e){}
+      location.href='../index.html#me';
     });
   });
 

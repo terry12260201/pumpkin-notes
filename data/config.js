@@ -17,5 +17,5 @@ window.PN_CONFIG = {
      Supabase → Authentication → URL Configuration 的 Redirect URLs
      要同時填這個網址和 http://localhost:8000/ */
   siteUrl: 'https://terry12260201.github.io/pumpkin-notes/',
-  googleEnabled: false   /* 南瓜在 Supabase 開通 Google 登入後改 true */
+  googleEnabled: true    /* 南瓜在 Supabase 開通 Google 登入後改 true */
 };

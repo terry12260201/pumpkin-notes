@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="看一支影片的時間，換一疊帶得走的筆記。">
-<title>小南瓜數位筆記 — 看一支影片的時間，換一疊帶得走的筆記。</title>
+<title>Pumpkin Notes · 團隊影片筆記</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,900&family=Roboto+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* ink-gold kit:start */
@@ -582,6 +582,14 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 .grid.is-list .card__d{-webkit-line-clamp:3}
 @media(max-width:640px){.grid.is-list .card{flex-direction:column}.grid.is-list .card__cv{width:100%;flex:auto}}
 
+/* 書架與標籤管理 */
+.mg-h{margin-top:18px;font-size:14px;font-weight:600;color:var(--ig-ink)}
+.mg-f{margin-top:12px;font:500 12px var(--ig-font-mono);color:var(--ig-ink-muted);letter-spacing:.06em}
+.mg-row{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:8px}
+.mg-row input{height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--ig-ink-hairline);background:var(--ig-card-alt);color:var(--ig-ink);font:400 14px var(--ig-font-sans);min-width:0}
+.mg-row input:focus{outline:none;box-shadow:var(--ig-focus)}
+.mg-k{font:12px var(--ig-font-mono);color:var(--ig-ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:640px){.mg-row{grid-template-columns:minmax(0,1fr) auto}.mg-k{display:none}}
 /* 垃圾桶 */
 .trash{display:flex;flex-direction:column;gap:10px;margin-top:14px}
 .trash__row{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 16px 12px 12px}
@@ -743,7 +751,7 @@ body[data-theme="night"] .card__cv img{filter:none}
 
 <header class="app-nav">
   <div class="app-nav__in">
-    <a class="app-brand" href="#library"><svg class="pn-logo" viewBox="0 0 1300 320" fill="currentColor" role="img" aria-label="南瓜虛擬科技"><path d="M327.4,175.1v92.26h48.8l.15-21,.22-21.08,12.82-7.32c7.07-4,24.48-14.06,38.83-22.26l26-14.94-.21-41.8c-.22-41.74-.22-41.81-1.83-44.89a25.38,25.38,0,0,0-9.54-9.51c-2.55-1.25-6.12-1.32-58.93-1.54l-56.31-.15Zm76.19-50.3,1.75,2v37.86l-14.2,8.49c-7.8,4.69-14.35,8.49-14.57,8.49s-.37-13.4-.37-29.72V122.32l12.82.22,12.83.21Z"/><path d="M462.89,166.68c0,81,.08,84,1.39,87.5,2,5.41,4.44,8.2,9.25,10.61l4.3,2.2,55.94.22,55.88.15V82.85H540.84V228l-12.75-.3c-12.09-.22-12.82-.29-14.35-1.9l-1.67-1.68-.22-70.58-.15-70.66H462.89Z"/><path d="M598.39,175.1v92.26H647.2v-145h29.14v145h48.81v-145l12.82.22,12.82.21,1.75,2,1.75,2V267.36h48.8L803,181.91c-.22-71.53-.37-85.81-1.24-87.34a23.7,23.7,0,0,0-9-9.23l-3.86-2.12L693.68,83l-95.29-.15Z"/><path d="M811.84,175.1v92.26h48.8V247c0-15.15.22-20.65,1-21.52.44-.66,6.12-4.1,12.53-7.69s23.53-13.47,38.1-21.82l26.44-15.23-.21-41.8c-.22-47.3.07-44.52-6.2-50.74-5.75-5.57-3.13-5.35-65.2-5.35H811.84ZM888,124.8l1.75,2v37.78l-14,8.5c-7.73,4.61-14.28,8.27-14.57,8.05-.73-.44-.73-57.62-.08-58.35.3-.29,6.05-.44,12.82-.29l12.32.21Z"/><path d="M947.33,175.1v92.26h48.81v-57l6.78-4.1c3.71-2.2,7.14-4,7.57-4,1.53,0,12.61,6.67,13.7,8.28.94,1.32,1.09,5.63,1.09,29.21v27.68h48.81v-32.8c0-36.39-.15-37.86-4.52-42.4-1.31-1.39-5.9-4.54-10.2-7s-7.86-4.68-7.86-5,5.1-3.81,11.29-7.91l11.29-7.4v-82h-48.81v65.09l-1.6.88c-.95.44-7.07,4.25-13.7,8.42s-12.45,7.61-13,7.61-.88-9.37-.88-41v-41H947.33Z"/><path d="M1082.83,175.1v92.26h48.81V82.85h-48.81Z"/><path d="M1141.11,175.1v92.26h48.81v-145h11.65c13.19,0,15.3.58,16.69,4.46.58,1.69.8,22.77.8,71.39v69.12h48.08V182.94c0-55-.3-85.3-.73-87.06-1.17-4.17-6.63-9.73-11.37-11.49-3.86-1.54-5.24-1.54-58.93-1.54h-55Z"/><path d="M199.19,174.89l-42.56,69.48c-6.26,10.21,1.57,23,14.09,23h24.34a16.47,16.47,0,0,0,14.09-7.67l52-84.8a14.58,14.58,0,0,0,0-15.32l-14.28-23.3a16.44,16.44,0,0,0-14.08-7.67H208.39c-12.52,0-20.35,12.78-14.09,23l4.89,8a14.53,14.53,0,0,1,0,15.32"/><path d="M76.38,128.6H53.5a16.47,16.47,0,0,0-14.09,7.67l-14.28,23.3a14.58,14.58,0,0,0,0,15.32l25.72,42c6.26,10.23,21.91,10.23,28.17,0l25.72-42a14.53,14.53,0,0,0,0-15.32l-14.27-23.3a16.47,16.47,0,0,0-14.09-7.67"/><path d="M137.74,98.56H110.6c-12.5,0-20.33,12.74-14.1,23l23.17,38.06a14.56,14.56,0,0,1,0,15.3L77.08,244.37a14.58,14.58,0,0,0,0,15.32,16.5,16.5,0,0,0,14.09,7.67h27.09a16.48,16.48,0,0,0,14.08-7.67l52-84.81a14.56,14.56,0,0,0,0-15.3l-32.47-53.32a16.45,16.45,0,0,0-14.11-7.7"/><path d="M130.81,86.82H117c-7.08,0-11.51-7.23-8-13l22-35.88a9.31,9.31,0,0,1,8-4.33h49.05a9.31,9.31,0,0,1,8,4.33,8.23,8.23,0,0,1,0,8.68l-6.47,10.57a9.34,9.34,0,0,1-8,4.33H156.94a9.32,9.32,0,0,0-8,4.34L138.78,82.48a9.32,9.32,0,0,1-8,4.34"/></svg><span class="app-brand__t">小南瓜數位筆記</span></a>
+    <a class="app-brand" href="#library"><svg class="pn-logo" viewBox="0 0 1300 320" fill="currentColor" role="img" aria-label="南瓜虛擬科技"><path d="M327.4,175.1v92.26h48.8l.15-21,.22-21.08,12.82-7.32c7.07-4,24.48-14.06,38.83-22.26l26-14.94-.21-41.8c-.22-41.74-.22-41.81-1.83-44.89a25.38,25.38,0,0,0-9.54-9.51c-2.55-1.25-6.12-1.32-58.93-1.54l-56.31-.15Zm76.19-50.3,1.75,2v37.86l-14.2,8.49c-7.8,4.69-14.35,8.49-14.57,8.49s-.37-13.4-.37-29.72V122.32l12.82.22,12.83.21Z"/><path d="M462.89,166.68c0,81,.08,84,1.39,87.5,2,5.41,4.44,8.2,9.25,10.61l4.3,2.2,55.94.22,55.88.15V82.85H540.84V228l-12.75-.3c-12.09-.22-12.82-.29-14.35-1.9l-1.67-1.68-.22-70.58-.15-70.66H462.89Z"/><path d="M598.39,175.1v92.26H647.2v-145h29.14v145h48.81v-145l12.82.22,12.82.21,1.75,2,1.75,2V267.36h48.8L803,181.91c-.22-71.53-.37-85.81-1.24-87.34a23.7,23.7,0,0,0-9-9.23l-3.86-2.12L693.68,83l-95.29-.15Z"/><path d="M811.84,175.1v92.26h48.8V247c0-15.15.22-20.65,1-21.52.44-.66,6.12-4.1,12.53-7.69s23.53-13.47,38.1-21.82l26.44-15.23-.21-41.8c-.22-47.3.07-44.52-6.2-50.74-5.75-5.57-3.13-5.35-65.2-5.35H811.84ZM888,124.8l1.75,2v37.78l-14,8.5c-7.73,4.61-14.28,8.27-14.57,8.05-.73-.44-.73-57.62-.08-58.35.3-.29,6.05-.44,12.82-.29l12.32.21Z"/><path d="M947.33,175.1v92.26h48.81v-57l6.78-4.1c3.71-2.2,7.14-4,7.57-4,1.53,0,12.61,6.67,13.7,8.28.94,1.32,1.09,5.63,1.09,29.21v27.68h48.81v-32.8c0-36.39-.15-37.86-4.52-42.4-1.31-1.39-5.9-4.54-10.2-7s-7.86-4.68-7.86-5,5.1-3.81,11.29-7.91l11.29-7.4v-82h-48.81v65.09l-1.6.88c-.95.44-7.07,4.25-13.7,8.42s-12.45,7.61-13,7.61-.88-9.37-.88-41v-41H947.33Z"/><path d="M1082.83,175.1v92.26h48.81V82.85h-48.81Z"/><path d="M1141.11,175.1v92.26h48.81v-145h11.65c13.19,0,15.3.58,16.69,4.46.58,1.69.8,22.77.8,71.39v69.12h48.08V182.94c0-55-.3-85.3-.73-87.06-1.17-4.17-6.63-9.73-11.37-11.49-3.86-1.54-5.24-1.54-58.93-1.54h-55Z"/><path d="M199.19,174.89l-42.56,69.48c-6.26,10.21,1.57,23,14.09,23h24.34a16.47,16.47,0,0,0,14.09-7.67l52-84.8a14.58,14.58,0,0,0,0-15.32l-14.28-23.3a16.44,16.44,0,0,0-14.08-7.67H208.39c-12.52,0-20.35,12.78-14.09,23l4.89,8a14.53,14.53,0,0,1,0,15.32"/><path d="M76.38,128.6H53.5a16.47,16.47,0,0,0-14.09,7.67l-14.28,23.3a14.58,14.58,0,0,0,0,15.32l25.72,42c6.26,10.23,21.91,10.23,28.17,0l25.72-42a14.53,14.53,0,0,0,0-15.32l-14.27-23.3a16.47,16.47,0,0,0-14.09-7.67"/><path d="M137.74,98.56H110.6c-12.5,0-20.33,12.74-14.1,23l23.17,38.06a14.56,14.56,0,0,1,0,15.3L77.08,244.37a14.58,14.58,0,0,0,0,15.32,16.5,16.5,0,0,0,14.09,7.67h27.09a16.48,16.48,0,0,0,14.08-7.67l52-84.81a14.56,14.56,0,0,0,0-15.3l-32.47-53.32a16.45,16.45,0,0,0-14.11-7.7"/><path d="M130.81,86.82H117c-7.08,0-11.51-7.23-8-13l22-35.88a9.31,9.31,0,0,1,8-4.33h49.05a9.31,9.31,0,0,1,8,4.33,8.23,8.23,0,0,1,0,8.68l-6.47,10.57a9.34,9.34,0,0,1-8,4.33H156.94a9.32,9.32,0,0,0-8,4.34L138.78,82.48a9.32,9.32,0,0,1-8,4.34"/></svg></a>
     <nav class="app-tabs" id="tabs" aria-label="主選單">
       <a href="#library" aria-label="筆記書架" data-route="library"><svg><use href="#i-book"/></svg><span>筆記書架</span></a>
       <a href="#team" aria-label="團隊共筆" data-route="team"><svg><use href="#i-users"/></svg><span>團隊共筆</span></a>
@@ -763,8 +771,8 @@ body[data-theme="night"] .card__cv img{filter:none}
     <div class="hero">
       <div>
         <p class="ig-eyebrow">LIBRARY · 筆記書架</p>
-        <h1 class="hero__t">影片丟進來，<span>重點自己長出來。</span></h1>
-        <p class="hero__lead">貼上 YouTube、課程連結或錄影檔，小南瓜會把它整理成有截圖、有時間戳、有白話辭典的圖文筆記——存進你的第二大腦，也能一鍵分享給南瓜的夥伴。</p>
+        <h1 class="hero__t">把影片，<span>變成團隊用得上的筆記。</span></h1>
+        <p class="hero__lead">貼上 YouTube、課程連結或錄影檔，系統會整理成有截圖、有時間戳、有白話辭典的圖文筆記。存進你的知識庫，也能一鍵分享給團隊。</p>
         <div class="hero__btns">
           <a class="quick-link" href="#inbox"><svg><use href="#i-spark"/></svg><span><b>整理新筆記</b><small>從一支影片，開始累積</small></span><svg class="quick-arrow"><use href="#i-arrow"/></svg></a>
           <a class="quick-link" href="#team"><svg><use href="#i-users"/></svg><span><b>看看夥伴的書架</b><small>分享值得留下的發現</small></span><svg class="quick-arrow"><use href="#i-arrow"/></svg></a>
@@ -801,7 +809,7 @@ body[data-theme="night"] .card__cv img{filter:none}
     </details>
     <p class="count" id="count" role="status" aria-live="polite"></p>
     <div class="grid" id="grid"></div>
-    <div class="empty" id="empty" hidden><div class="art"><img src="assets/art/empty-library.png" alt="" loading="lazy"></div><p id="empty-t"></p></div>
+    <div class="empty" id="empty" hidden><p id="empty-t"></p></div>
     <div class="pager" id="pager"></div>
 
     <details class="reading-guide"><summary>第一次來？四個小技巧，讀得更輕鬆 <span>＋</span></summary><div class="stage">
@@ -832,8 +840,7 @@ body[data-theme="night"] .card__cv img{filter:none}
       </div>
       <div class="facet"><p class="facet__l">領域</p><div class="ig-pills" id="t-dept"></div></div>
       <div class="people" id="people"></div>
-      <div class="empty" id="t-empty" hidden><div class="art"><img src="assets/art/empty-team.png" alt="" loading="lazy"></div>
-        <p>還沒有人分享。第一個把好東西端上桌的人，會被記得很久。</p></div>
+      <div class="empty" id="t-empty" hidden><p>還沒有人分享。第一個把好東西端上桌的人，會被記得很久。</p></div>
       <details class="fold" id="t-fold" hidden><summary>還沒開張的夥伴</summary><div class="people" id="t-none"></div></details>
       <div class="stage"><p class="ig-eyebrow">This month · 本月</p><p class="stage__big" id="t-stage"></p></div>
     </div>
@@ -845,7 +852,7 @@ body[data-theme="night"] .card__cv img{filter:none}
       <div class="sec__head"><div>
         <p class="ig-eyebrow">INBOX · 收件匣</p>
         <h2>收件匣</h2>
-        <p class="sec__lead">貼上連結或拖進檔案，剩下的交給小南瓜。</p>
+        <p class="sec__lead">貼上影片連結或拖進錄影檔，系統會自動整理成筆記。</p>
       </div></div>
 
       <div class="ig-card drop">
@@ -861,12 +868,11 @@ body[data-theme="night"] .card__cv img{filter:none}
           </select><svg><use href="#i-down"/></svg></span>
           <label class="chk"><input type="checkbox" id="j-share">整理完直接分享給團隊</label>
         </div>
-        <p class="ig-small">小南瓜的機器還沒上線，會在下次開機時接手處理。</p>
+        <p class="ig-small">整理主機還沒上線，會在下次啟動時接手處理。</p>
       </div>
 
       <div class="jobs" id="jobs"></div>
-      <div class="empty" id="j-empty"><div class="art"><img src="assets/art/empty-inbox.png" alt="" loading="lazy"></div>
-        <p>還沒有排隊的影片。</p></div>
+      <div class="empty" id="j-empty"><p>還沒有排隊的影片。</p></div>
     </div>
   </section>
 
@@ -891,7 +897,6 @@ body[data-theme="night"] .card__cv img{filter:none}
   <!-- ══════════ 登入 ══════════ -->
   <section class="app-wrap" id="v-login" hidden>
     <div class="ig-card login">
-      <div class="art"><img src="assets/art/empty-library.png" alt="" loading="lazy"></div>
       <h2>用公司信箱登入</h2>
       <p>只開放 @pumpkinvrar.com 與受邀夥伴。</p>
       <div class="login__box" id="login-box"></div>
@@ -901,15 +906,15 @@ body[data-theme="night"] .card__cv img{filter:none}
 
 <footer class="app-foot"><div class="app-foot__in">
   <svg class="pn-logo" viewBox="0 0 1300 320" fill="currentColor" role="img" aria-label="南瓜虛擬科技"><path d="M327.4,175.1v92.26h48.8l.15-21,.22-21.08,12.82-7.32c7.07-4,24.48-14.06,38.83-22.26l26-14.94-.21-41.8c-.22-41.74-.22-41.81-1.83-44.89a25.38,25.38,0,0,0-9.54-9.51c-2.55-1.25-6.12-1.32-58.93-1.54l-56.31-.15Zm76.19-50.3,1.75,2v37.86l-14.2,8.49c-7.8,4.69-14.35,8.49-14.57,8.49s-.37-13.4-.37-29.72V122.32l12.82.22,12.83.21Z"/><path d="M462.89,166.68c0,81,.08,84,1.39,87.5,2,5.41,4.44,8.2,9.25,10.61l4.3,2.2,55.94.22,55.88.15V82.85H540.84V228l-12.75-.3c-12.09-.22-12.82-.29-14.35-1.9l-1.67-1.68-.22-70.58-.15-70.66H462.89Z"/><path d="M598.39,175.1v92.26H647.2v-145h29.14v145h48.81v-145l12.82.22,12.82.21,1.75,2,1.75,2V267.36h48.8L803,181.91c-.22-71.53-.37-85.81-1.24-87.34a23.7,23.7,0,0,0-9-9.23l-3.86-2.12L693.68,83l-95.29-.15Z"/><path d="M811.84,175.1v92.26h48.8V247c0-15.15.22-20.65,1-21.52.44-.66,6.12-4.1,12.53-7.69s23.53-13.47,38.1-21.82l26.44-15.23-.21-41.8c-.22-47.3.07-44.52-6.2-50.74-5.75-5.57-3.13-5.35-65.2-5.35H811.84ZM888,124.8l1.75,2v37.78l-14,8.5c-7.73,4.61-14.28,8.27-14.57,8.05-.73-.44-.73-57.62-.08-58.35.3-.29,6.05-.44,12.82-.29l12.32.21Z"/><path d="M947.33,175.1v92.26h48.81v-57l6.78-4.1c3.71-2.2,7.14-4,7.57-4,1.53,0,12.61,6.67,13.7,8.28.94,1.32,1.09,5.63,1.09,29.21v27.68h48.81v-32.8c0-36.39-.15-37.86-4.52-42.4-1.31-1.39-5.9-4.54-10.2-7s-7.86-4.68-7.86-5,5.1-3.81,11.29-7.91l11.29-7.4v-82h-48.81v65.09l-1.6.88c-.95.44-7.07,4.25-13.7,8.42s-12.45,7.61-13,7.61-.88-9.37-.88-41v-41H947.33Z"/><path d="M1082.83,175.1v92.26h48.81V82.85h-48.81Z"/><path d="M1141.11,175.1v92.26h48.81v-145h11.65c13.19,0,15.3.58,16.69,4.46.58,1.69.8,22.77.8,71.39v69.12h48.08V182.94c0-55-.3-85.3-.73-87.06-1.17-4.17-6.63-9.73-11.37-11.49-3.86-1.54-5.24-1.54-58.93-1.54h-55Z"/><path d="M199.19,174.89l-42.56,69.48c-6.26,10.21,1.57,23,14.09,23h24.34a16.47,16.47,0,0,0,14.09-7.67l52-84.8a14.58,14.58,0,0,0,0-15.32l-14.28-23.3a16.44,16.44,0,0,0-14.08-7.67H208.39c-12.52,0-20.35,12.78-14.09,23l4.89,8a14.53,14.53,0,0,1,0,15.32"/><path d="M76.38,128.6H53.5a16.47,16.47,0,0,0-14.09,7.67l-14.28,23.3a14.58,14.58,0,0,0,0,15.32l25.72,42c6.26,10.23,21.91,10.23,28.17,0l25.72-42a14.53,14.53,0,0,0,0-15.32l-14.27-23.3a16.47,16.47,0,0,0-14.09-7.67"/><path d="M137.74,98.56H110.6c-12.5,0-20.33,12.74-14.1,23l23.17,38.06a14.56,14.56,0,0,1,0,15.3L77.08,244.37a14.58,14.58,0,0,0,0,15.32,16.5,16.5,0,0,0,14.09,7.67h27.09a16.48,16.48,0,0,0,14.08-7.67l52-84.81a14.56,14.56,0,0,0,0-15.3l-32.47-53.32a16.45,16.45,0,0,0-14.11-7.7"/><path d="M130.81,86.82H117c-7.08,0-11.51-7.23-8-13l22-35.88a9.31,9.31,0,0,1,8-4.33h49.05a9.31,9.31,0,0,1,8,4.33,8.23,8.23,0,0,1,0,8.68l-6.47,10.57a9.34,9.34,0,0,1-8,4.33H156.94a9.32,9.32,0,0,0-8,4.34L138.78,82.48a9.32,9.32,0,0,1-8,4.34"/></svg>
-  <span>小南瓜數位筆記 · 看一支影片的時間，換一疊帶得走的筆記。</span>
+  <span>Pumpkin Notes · 看一支影片的時間，換一疊帶得走的筆記。</span>
   <span class="app-foot__r" id="foot-gen"></span>
 </div></footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data/config.js"></script>
-<script src="data/reports.js"></script>
-<script src="data/store.js"></script>
+<script src="data/config.js?v=20260918b"></script>
+<script src="data/reports.js?v=20260918b"></script>
+<script src="data/store.js?v=20260918b"></script>
 <script>
 /* ── 小南瓜數位筆記 V03：首頁殼 ──────────────────────────────
    路由：#library / #team / #inbox / #me（＋未登入時的 #login）
@@ -1222,7 +1227,7 @@ body[data-theme="night"] .card__cv img{filter:none}
         '<button class="app-icbtn" data-drop aria-label="移除這張排隊卡"><svg><use href="#i-x"/></svg></button></div>' +
         '<div class="steps">' + STEPS.map(function (_, i) { return '<i class="' + (i <= j.step ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
         '<div class="steps__l">' + STEPS.map(function (s, i) { return '<span class="' + (i <= j.step ? 'on' : '') + '">' + s + '</span>'; }).join('') + '</div>' +
-        '<p class="job__msg">' + esc(j.step === 0 && j.stalled ? '小南瓜的機器還沒上線，會在下次開機時接手處理。' : (j.msg || STEP_MSG[j.step])) + '</p>' +
+        '<p class="job__msg">' + esc(j.step === 0 && j.stalled ? '整理主機還沒上線，會在下次啟動時接手處理。' : (j.msg || STEP_MSG[j.step])) + '</p>' +
         '</div>';
     }).join('');
     js.forEach(function (j) { if (j.step < 4 && !j.stalled && !timers[j.id]) tick(j.id); });
@@ -1252,7 +1257,7 @@ body[data-theme="night"] .card__cv img{filter:none}
       .then(function (j) {
         renderInbox();
         toast(S.isOffline() ? '已排進收件匣（示範進度，真的產線在 Phase 3）'
-                            : '已排進收件匣。小南瓜的機器一上線就會接手。');
+                            : '已排進收件匣。整理主機一上線就會接手。');
         return j;
       });
   }
@@ -1270,6 +1275,45 @@ body[data-theme="night"] .card__cv img{filter:none}
     });
   }
 
+  /* 書架與標籤改名（只有 owner 看得到；示範模式也可試） */
+  function manageHTML() {
+    var sh = D.shelves.map(function (s) {
+      return '<div class="mg-row"><span class="mg-k">' + esc(s.id) + '</span><input data-shelf="' + esc(s.id) + '" value="' + esc(s.name) + '" maxlength="30"><button class="ig-btn ig-btn--sm" data-save-shelf="' + esc(s.id) + '">存</button></div>';
+    }).join('');
+    var vocab = S.vocab(), tg = '';
+    ['主題', '用途', '關聯'].forEach(function (f) {
+      var vals = vocab[f] || []; if (!vals.length) return;
+      tg += '<p class="mg-f">' + f + '</p>' + vals.map(function (v) {
+        return '<div class="mg-row"><span class="mg-k">' + f + '/</span><input data-tag-f="' + esc(f) + '" data-tag-old="' + esc(v) + '" value="' + esc(v) + '" maxlength="20"><button class="ig-btn ig-btn--sm" data-save-tag="1">存</button></div>';
+      }).join('');
+    });
+    return '<div class="ig-card me-card" style="margin-top:14px"><p class="ig-eyebrow">Manage · 書架與標籤</p>' +
+      '<p class="ig-small" style="margin-top:6px">改完名稱，所有筆記上的顯示會一起更新。標籤名不能有空格。</p>' +
+      '<h4 class="mg-h">書架名稱</h4>' + sh + '<h4 class="mg-h">篩選標籤</h4>' + tg + '</div>';
+  }
+  function bindManage() {
+    $$('[data-save-shelf]').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.dataset.saveShelf, v = $('[data-shelf="' + id + '"]').value.trim();
+        if (!v) { toast('書架名稱不能空白'); return; }
+        Promise.resolve(S.renameShelf(id, v)).then(function (ok) {
+          if (!ok) { toast('沒存成，再試一次'); return; }
+          toast('書架名稱已更新'); renderFacets(); renderGrid(); renderMe();
+        });
+      };
+    });
+    $$('[data-save-tag]').forEach(function (b) {
+      b.onclick = function () {
+        var inp = b.previousElementSibling, f = inp.dataset.tagF, old = inp.dataset.tagOld, v = inp.value.trim().replace(/\s+/g, '');
+        if (!v || v === old) return;
+        Promise.resolve(S.renameTag(f, old, v)).then(function (ok) {
+          if (!ok) { toast('沒存成，再試一次'); return; }
+          toast('標籤已更新：' + old + ' → ' + v); renderFacets(); renderGrid(); renderMe();
+        });
+      };
+    });
+  }
+
   function renderMe() {
     var me = S.me(), tab = st.me;
     $$('#me-tabs .ig-pill').forEach(function (b) { b.classList.toggle('is-active', b.dataset.me === tab); });
@@ -1283,7 +1327,9 @@ body[data-theme="night"] .card__cv img{filter:none}
         '<label>職稱<input id="m-title" value="' + esc(me.title) + '"></label>' +
         '<label>頭像<input value="' + esc((me.name || '？').slice(0, 1)) + '" disabled></label>' +
         '</div><p class="ig-small" style="margin-top:14px">' + (S.isOffline() ? '示範模式只存在這台電腦；登入後才會存進 profiles 表。' : '會存進 Supabase 的 profiles，團隊頁上大家就看得到。') + '</p>' +
-        '<div style="margin-top:16px"><button class="ig-btn ig-btn--ink ig-btn--sm" id="m-save"><svg><use href="#i-check"/></svg>存起來</button></div></div>';
+        '<div style="margin-top:16px"><button class="ig-btn ig-btn--ink ig-btn--sm" id="m-save"><svg><use href="#i-check"/></svg>存起來</button></div></div>' +
+        (S.canManage() ? manageHTML() : '');
+      bindManage();
       $('#m-save').onclick = function () {
         Promise.resolve(S.setMe({ name: $('#m-name').value.trim() || me.name, department: $('#m-dep').value.trim(), title: $('#m-title').value.trim() }))
           .then(function () { renderNav(); renderMe(); toast(S.isOffline() ? '已存到這台電腦的瀏覽器' : '已存到你的 profile'); });
@@ -1335,7 +1381,7 @@ body[data-theme="night"] .card__cv img{filter:none}
   }
 
   function exportAll() {
-    var me = S.me(), out = ['# 小南瓜數位筆記 · ' + me.name + '的書架', '',
+    var me = S.me(), out = ['# Pumpkin Notes · ' + me.name + '的書架', '',
       '> 匯出時間：' + new Date().toISOString().slice(0, 10) + '　·　Phase 1 先匯出索引（標題、標籤、連結）；',
       '> 含截圖的完整 Obsidian 包要等 Phase 3 的 worker 打包。', ''];
     D.shelves.forEach(function (s) {
@@ -1352,7 +1398,7 @@ body[data-theme="night"] .card__cv img{filter:none}
     });
     var blob = new Blob([out.join('\n')], { type: 'text/markdown;charset=utf-8' });
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = '小南瓜數位筆記_索引.md'; a.click();
+    a.href = URL.createObjectURL(blob); a.download = 'PumpkinNotes_索引.md'; a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
     toast('已下載索引 Markdown（完整包在 Phase 3）');
   }

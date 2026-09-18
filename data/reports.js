@@ -64,14 +64,14 @@ window.PN_DATA = {
   "主題/AI代理人": 5,
   "主題/自動化": 3,
   "主題/資料分析": 2,
-  "用途/案例故事": 5,
+  "用途/案例分享": 5,
   "主題/VibeCoding": 2,
   "主題/產品上線": 1,
-  "用途/建立觀念": 4,
+  "用途/觀念建立": 4,
   "主題/Harness工程": 4,
   "主題/團隊導入": 4,
   "主題/MCP": 1,
-  "用途/照著做": 3,
+  "用途/實作教學": 3,
   "主題/脈絡工程": 2,
   "主題/資安邊界": 1,
   "主題/成本控管": 1,
@@ -122,7 +122,7 @@ window.PN_DATA = {
     "主題/AI代理人",
     "主題/自動化",
     "主題/資料分析",
-    "用途/案例故事"
+    "用途/案例分享"
    ],
    "keywords": [],
    "glossary": [
@@ -158,7 +158,7 @@ window.PN_DATA = {
    "figs": 15,
    "owner": "terry",
    "visibility": "team",
-   "hay": "從 0 開始養一隻幫公司查帳的狗！ 馮元詰（薩泰爾娛樂 全端工程師） 892 天把人工報帳變成跟 ai 說一句話就查完帳。但他們不是一開始就想做 ai——統一命名才是真正的地基。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 ai代理人 自動化 資料分析 案例故事 主題/ai代理人 主題/自動化 主題/資料分析 用途/案例故事 ddd（領域驅動設計） google apps script postgresql redis 關聯式資料庫 ai agent（ai 代理人） tool list（工具清單） mcp pat（個人存取權杖） 互動成本 ai native 大綱總結（1 分鐘看完全場） 這是一個「不是照著計畫走」的故事 1 起點：張飛獨守長坂坡（2:12–3:03） 2 方法論：先讓當事人把故事講一遍（3:55–5:38） 3 ⭐ 最關鍵的一步：把公司所有的名字重新定義（5:39–7:49） 4 翻車：5000 筆資料，bang（8:16–10:23） 5 重寫，然後撞上第四扇門（10:24–12:33） 6 養出狗：三個問題，三個答案（13:00–16:00） 7 走出狗屋：被同事推著再進化（16:00–18:18） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "從 0 開始養一隻幫公司查帳的狗！ 馮元詰（薩泰爾娛樂 全端工程師） 892 天把人工報帳變成跟 ai 說一句話就查完帳。但他們不是一開始就想做 ai——統一命名才是真正的地基。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 ai代理人 自動化 資料分析 案例分享 主題/ai代理人 主題/自動化 主題/資料分析 用途/案例分享 ddd（領域驅動設計） google apps script postgresql redis 關聯式資料庫 ai agent（ai 代理人） tool list（工具清單） mcp pat（個人存取權杖） 互動成本 ai native 大綱總結（1 分鐘看完全場） 這是一個「不是照著計畫走」的故事 1 起點：張飛獨守長坂坡（2:12–3:03） 2 方法論：先讓當事人把故事講一遍（3:55–5:38） 3 ⭐ 最關鍵的一步：把公司所有的名字重新定義（5:39–7:49） 4 翻車：5000 筆資料，bang（8:16–10:23） 5 重寫，然後撞上第四扇門（10:24–12:33） 6 養出狗：三個問題，三個答案（13:00–16:00） 7 走出狗屋：被同事推著再進化（16:00–18:18） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "lin-vibe-to-production",
@@ -179,7 +179,7 @@ window.PN_DATA = {
    "tags": [
     "主題/VibeCoding",
     "主題/產品上線",
-    "用途/建立觀念"
+    "用途/觀念建立"
    ],
    "keywords": [],
    "glossary": [
@@ -216,7 +216,7 @@ window.PN_DATA = {
    "figs": 16,
    "owner": "terry",
    "visibility": "team",
-   "hay": "從 vibe coding 到真正可以上線的產品：你還差了什麼？ 林沅霖（zeabur 創辦人） 酸民說「這就是小玩具」，其實在提醒六件事：安全、擴展、資料、上線、可觀測、可維護。每件都附可直接複製的 prompt，共 18 組。 2026 generative ai 年會 vibe coding 年會 gaiconf 深入 vibecoding 產品上線 建立觀念 主題/vibecoding 主題/產品上線 用途/建立觀念 vibe coding 紅隊演練 api key（金鑰） rls（資料列權限） cdn 快取（cache） 冪等性 pitr（時間點還原） e2e（端到端測試） 單元測試 chrome mcp rollback（回滾） 可觀測性 報警（alerting） 理解債 單一資料來源 er 圖（實體關係圖） 大綱總結（1 分鐘看完全場） 這場在講什麼？（0:00–3:23） 1 安全：你是不是把門打開了？（3:24–5:59） 2 可擴展性：這東西適合多少人一起用？（6:00–8:34） 3 資料可靠性：資料壞掉比服務掛掉更慘（8:35–11:10） 4 上線成功率：你是不是每次都在賭？（11:11–13:48） 5 可觀測性：壞了，你知道嗎？（13:49–17:45） 6 可維護性：你看不懂程式，也要看得懂設計（17:46–19:55） 收尾：這六件事都不是三分鐘的東西 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "從 vibe coding 到真正可以上線的產品：你還差了什麼？ 林沅霖（zeabur 創辦人） 酸民說「這就是小玩具」，其實在提醒六件事：安全、擴展、資料、上線、可觀測、可維護。每件都附可直接複製的 prompt，共 18 組。 2026 generative ai 年會 vibe coding 年會 gaiconf 深入 vibecoding 產品上線 觀念建立 主題/vibecoding 主題/產品上線 用途/觀念建立 vibe coding 紅隊演練 api key（金鑰） rls（資料列權限） cdn 快取（cache） 冪等性 pitr（時間點還原） e2e（端到端測試） 單元測試 chrome mcp rollback（回滾） 可觀測性 報警（alerting） 理解債 單一資料來源 er 圖（實體關係圖） 大綱總結（1 分鐘看完全場） 這場在講什麼？（0:00–3:23） 1 安全：你是不是把門打開了？（3:24–5:59） 2 可擴展性：這東西適合多少人一起用？（6:00–8:34） 3 資料可靠性：資料壞掉比服務掛掉更慘（8:35–11:10） 4 上線成功率：你是不是每次都在賭？（11:11–13:48） 5 可觀測性：壞了，你知道嗎？（13:49–17:45） 6 可維護性：你看不懂程式，也要看得懂設計（17:46–19:55） 收尾：這六件事都不是三分鐘的東西 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "gao-vibe-or-blindbox",
@@ -236,7 +236,7 @@ window.PN_DATA = {
    "cover": "covers/gao-vibe-or-blindbox.jpg",
    "tags": [
     "主題/VibeCoding",
-    "用途/建立觀念"
+    "用途/觀念建立"
    ],
    "keywords": [],
    "glossary": [
@@ -269,7 +269,7 @@ window.PN_DATA = {
    "figs": 16,
    "owner": "terry",
    "visibility": "team",
-   "hay": "vibe coding 是寫程式還是開盲盒 高見龍（五倍學院 · anthropic 社群大使） 同一句話喊兩次結果不一樣，因為 ai 只能猜你的意圖。解法是 sdd：動手前先講清楚。附一段零安裝、可直接複製的提示詞全文。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 vibecoding 建立觀念 主題/vibecoding 用途/建立觀念 vibe coding sdd（規格驅動開發） spec（規格） prompt（提示詞） 駕馭工程 / 迴圈工程 可打勾的任務清單 驗收條件 歸檔 spectra 大綱總結（1 分鐘看完全場） 問題：許願得到的是流星，還是隕石？ 順便吐槽一下那些名詞 為什麼 ai 不聽你的話？（3:52–5:12） 那「規格」到底長什麼樣？（5:13–7:49） 流程只有三個詞：提案 → 實作 → 歸檔 全文收錄：那段可以直接複製的提示詞 bonus：他自己做的視覺化工具 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "vibe coding 是寫程式還是開盲盒 高見龍（五倍學院 · anthropic 社群大使） 同一句話喊兩次結果不一樣，因為 ai 只能猜你的意圖。解法是 sdd：動手前先講清楚。附一段零安裝、可直接複製的提示詞全文。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 vibecoding 觀念建立 主題/vibecoding 用途/觀念建立 vibe coding sdd（規格驅動開發） spec（規格） prompt（提示詞） 駕馭工程 / 迴圈工程 可打勾的任務清單 驗收條件 歸檔 spectra 大綱總結（1 分鐘看完全場） 問題：許願得到的是流星，還是隕石？ 順便吐槽一下那些名詞 為什麼 ai 不聽你的話？（3:52–5:12） 那「規格」到底長什麼樣？（5:13–7:49） 流程只有三個詞：提案 → 實作 → 歸檔 全文收錄：那段可以直接複製的提示詞 bonus：他自己做的視覺化工具 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "jocelin-harness-piccollage",
@@ -290,7 +290,7 @@ window.PN_DATA = {
    "tags": [
     "主題/Harness工程",
     "主題/團隊導入",
-    "用途/案例故事"
+    "用途/案例分享"
    ],
    "keywords": [],
    "glossary": [
@@ -324,7 +324,7 @@ window.PN_DATA = {
    "figs": 16,
    "owner": "terry",
    "visibility": "team",
-   "hay": "harness engineering @ piccollage jocelin ho（piccollage 工程經理） ai 像辛普森家庭那個天真角色——本質不壞但需要引導。三階段框架：驗證→循環優化→解放創意。工程師工作量降三成、功能產出快十倍。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 harness工程 團隊導入 案例故事 主題/harness工程 主題/團隊導入 用途/案例故事 harness（馬具／駕馭工程） agent = llm + harness 確定性系統 unit test（單元測試） integration test（整合測試） e2e test（端到端測試） regression test（回歸測試） smoke test（冒煙測試） flaky（不穩定的測試） context rot（上下文腐爛） generator agent（產出者） evaluator agent（評審者） kanban（看板） 大綱總結（1 分鐘看完全場） 先認識一下：ai 其實比較像這個角色 1 驗證：在不確定的模型周圍，蓋一個確定的系統（4:19–8:41） 2 循環優化：不求一次做好，求它一直重試（8:42–12:36） 3 解放所有人的創意（12:37–15:41） 帶走這張框架，跟最後一句話 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "harness engineering @ piccollage jocelin ho（piccollage 工程經理） ai 像辛普森家庭那個天真角色——本質不壞但需要引導。三階段框架：驗證→循環優化→解放創意。工程師工作量降三成、功能產出快十倍。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 harness工程 團隊導入 案例分享 主題/harness工程 主題/團隊導入 用途/案例分享 harness（馬具／駕馭工程） agent = llm + harness 確定性系統 unit test（單元測試） integration test（整合測試） e2e test（端到端測試） regression test（回歸測試） smoke test（冒煙測試） flaky（不穩定的測試） context rot（上下文腐爛） generator agent（產出者） evaluator agent（評審者） kanban（看板） 大綱總結（1 分鐘看完全場） 先認識一下：ai 其實比較像這個角色 1 驗證：在不確定的模型周圍，蓋一個確定的系統（4:19–8:41） 2 循環優化：不求一次做好，求它一直重試（8:42–12:36） 3 解放所有人的創意（12:37–15:41） 帶走這張框架，跟最後一句話 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "leo-company-mcp",
@@ -345,7 +345,7 @@ window.PN_DATA = {
    "tags": [
     "主題/團隊導入",
     "主題/MCP",
-    "用途/案例故事"
+    "用途/案例分享"
    ],
    "keywords": [],
    "glossary": [
@@ -376,7 +376,7 @@ window.PN_DATA = {
    "figs": 18,
    "owner": "terry",
    "visibility": "team",
-   "hay": "當同事 ai 成癮之後，我們的下一步是什麼？ leo（大師課業 · shifu ai 研究所） 沒有工程師的團隊讓全公司都會做 ai 小工具，卻發現工具變多不代表流程變順。最大的坑：資料看起來完整但數字是錯的。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 團隊導入 mcp 案例故事 主題/團隊導入 主題/mcp 用途/案例故事 vibe coding mcp skill（技能包） audit（稽核紀錄） human in the loop sql srt 字幕檔 domain knowledge（領域知識） ai agent 大綱總結（1 分鐘看完全場） 一開始很順利：每週都有新工具出現 但更大的問題出現了 第一個大坑：ai 接上資料庫（6:30–9:30） 另一種難題：有些產出不是「對或錯」，是「好或不好」（9:31–14:30） 結論：把人放回流程裡 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "當同事 ai 成癮之後，我們的下一步是什麼？ leo（大師課業 · shifu ai 研究所） 沒有工程師的團隊讓全公司都會做 ai 小工具，卻發現工具變多不代表流程變順。最大的坑：資料看起來完整但數字是錯的。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 團隊導入 mcp 案例分享 主題/團隊導入 主題/mcp 用途/案例分享 vibe coding mcp skill（技能包） audit（稽核紀錄） human in the loop sql srt 字幕檔 domain knowledge（領域知識） ai agent 大綱總結（1 分鐘看完全場） 一開始很順利：每週都有新工具出現 但更大的問題出現了 第一個大坑：ai 接上資料庫（6:30–9:30） 另一種難題：有些產出不是「對或錯」，是「好或不好」（9:31–14:30） 結論：把人放回流程裡 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "zheng-esun-voice-warroom",
@@ -397,7 +397,7 @@ window.PN_DATA = {
    "tags": [
     "主題/資料分析",
     "主題/自動化",
-    "用途/案例故事"
+    "用途/案例分享"
    ],
    "keywords": [],
    "glossary": [
@@ -431,7 +431,7 @@ window.PN_DATA = {
    "figs": 17,
    "owner": "terry",
    "visibility": "team",
-   "hay": "玉山的聲量戰情室 鄭東濬 tc（玉山銀行 智能金融處） 搜自家銀行前五名沒有自己。找廠商要價一年三四百萬還會外流經驗，改用三隻 agent 自己兜。神轉折：做出平台的不是工程師，是資深經理人。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 資料分析 自動化 案例故事 主題/資料分析 主題/自動化 用途/案例故事 ai agent skill（技能包） playwright ai overview dashboard（戰情板） channel（通路） product（產品） competitor（競爭對手） devops sdlc（軟體開發生命週期） 反爬蟲 大綱總結（1 分鐘看完全場） 起點：他搜自己公司，前五名沒有自己 本來的路：找廠商做 他們的做法：三隻 agent 接力 看什麼：通路 × 產品 × 競爭對手 結果：省了幾百萬，知識留在自己家 神轉折：做這個平台的不是工程師 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "玉山的聲量戰情室 鄭東濬 tc（玉山銀行 智能金融處） 搜自家銀行前五名沒有自己。找廠商要價一年三四百萬還會外流經驗，改用三隻 agent 自己兜。神轉折：做出平台的不是工程師，是資深經理人。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 資料分析 自動化 案例分享 主題/資料分析 主題/自動化 用途/案例分享 ai agent skill（技能包） playwright ai overview dashboard（戰情板） channel（通路） product（產品） competitor（競爭對手） devops sdlc（軟體開發生命週期） 反爬蟲 大綱總結（1 分鐘看完全場） 起點：他搜自己公司，前五名沒有自己 本來的路：找廠商做 他們的做法：三隻 agent 接力 看什麼：通路 × 產品 × 競爭對手 結果：省了幾百萬，知識留在自己家 神轉折：做這個平台的不是工程師 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "hai-ai-self-upgrade",
@@ -452,7 +452,7 @@ window.PN_DATA = {
    "tags": [
     "主題/AI代理人",
     "主題/Harness工程",
-    "用途/照著做"
+    "用途/實作教學"
    ],
    "keywords": [],
    "glossary": [
@@ -487,7 +487,7 @@ window.PN_DATA = {
    "figs": 16,
    "owner": "terry",
    "visibility": "team",
-   "hay": "讓 ai 自己升級自己 海總理（小海） 把自己從 ai 迴圈裡抽掉，只要三個條件：看到結果、知道過程、能改自己。三個案例含「單次開發成本 5 美金降到 0.2 美金」。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 ai代理人 harness工程 照著做 主題/ai代理人 主題/harness工程 用途/照著做 loop（迴圈） prompt（提示詞） system prompt（系統提示詞） 提示詞攻擊 log（執行紀錄） api 費用 prompt caching（提示詞快取） caching rate（快取命中率） subagent（子代理） 評分標準 code review（程式碼審查） pr（合併請求） 大綱總結（1 分鐘看完全場） 起點：把自己從 ai 的迴圈裡抽掉 最懂 ai 的人是誰？ 案例 1：讓 ai 攻擊自己，自動修到攻不破（5:42–10:30） 案例 2：讓 ai 自己把費用壓下來（10:57–12:39） 案例 3：把開發拆小，5 美金變 0.2 美金（12:40–15:16） 複習：要怎麼開始 loop 起來？ 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "讓 ai 自己升級自己 海總理（小海） 把自己從 ai 迴圈裡抽掉，只要三個條件：看到結果、知道過程、能改自己。三個案例含「單次開發成本 5 美金降到 0.2 美金」。 2026 generative ai 年會 vibe coding 年會 gaiconf 進階 ai代理人 harness工程 實作教學 主題/ai代理人 主題/harness工程 用途/實作教學 loop（迴圈） prompt（提示詞） system prompt（系統提示詞） 提示詞攻擊 log（執行紀錄） api 費用 prompt caching（提示詞快取） caching rate（快取命中率） subagent（子代理） 評分標準 code review（程式碼審查） pr（合併請求） 大綱總結（1 分鐘看完全場） 起點：把自己從 ai 的迴圈裡抽掉 最懂 ai 的人是誰？ 案例 1：讓 ai 攻擊自己，自動修到攻不破（5:42–10:30） 案例 2：讓 ai 自己把費用壓下來（10:57–12:39） 案例 3：把開發拆小，5 美金變 0.2 美金（12:40–15:16） 複習：要怎麼開始 loop 起來？ 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "andrew-wu-service-smarter",
@@ -509,7 +509,7 @@ window.PN_DATA = {
     "主題/脈絡工程",
     "主題/資安邊界",
     "主題/團隊導入",
-    "用途/建立觀念"
+    "用途/觀念建立"
    ],
    "keywords": [],
    "glossary": [
@@ -543,7 +543,7 @@ window.PN_DATA = {
    "figs": 18,
    "owner": "terry",
    "visibility": "team",
-   "hay": "讓你的 service 偷偷變聰明 andrew wu（91app 首席架構師） 把 ai 放進自家產品會踩到的坑：關鍵不是挑模型而是挖出專家的 context；安全不能靠交代 ai，要用系統邊界擋；新問題只能自己練。 2026 generative ai 年會 開發者年會 gaiconf 深入 脈絡工程 資安邊界 團隊導入 建立觀念 主題/脈絡工程 主題/資安邊界 主題/團隊導入 用途/建立觀念 ai agent（ai 代理人） llm（大型語言模型） harness（外掛骨架） context（上下文） multi-agent（多代理人） adk skill（技能包） tool call（工具呼叫） function calling（函式呼叫） prompt injection（提示詞注入） 幻覺 api key（金鑰） vault（金庫） sandbox（沙箱） mcp managed agent platform（受管控的 agent 平台） pat（個人存取權杖） cli（指令列介面） gui（圖形介面） computer use（電腦操作） ax（agent experience） napl prp（需求原型驗證） mud 大綱總結（1 分鐘看完全場） 這場在講什麼？（先用生活例子） 1 part 1：做好一個 ai 助手，難在哪？（2:41–19:13） 2 part 2：客戶變多了，要蓋平台（19:14–52:40） 3 part 3：如果連「聊天」都不需要呢？（52:41–63:06） 三句話帶走（63:07–64:09） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "讓你的 service 偷偷變聰明 andrew wu（91app 首席架構師） 把 ai 放進自家產品會踩到的坑：關鍵不是挑模型而是挖出專家的 context；安全不能靠交代 ai，要用系統邊界擋；新問題只能自己練。 2026 generative ai 年會 開發者年會 gaiconf 深入 脈絡工程 資安邊界 團隊導入 觀念建立 主題/脈絡工程 主題/資安邊界 主題/團隊導入 用途/觀念建立 ai agent（ai 代理人） llm（大型語言模型） harness（外掛骨架） context（上下文） multi-agent（多代理人） adk skill（技能包） tool call（工具呼叫） function calling（函式呼叫） prompt injection（提示詞注入） 幻覺 api key（金鑰） vault（金庫） sandbox（沙箱） mcp managed agent platform（受管控的 agent 平台） pat（個人存取權杖） cli（指令列介面） gui（圖形介面） computer use（電腦操作） ax（agent experience） napl prp（需求原型驗證） mud 大綱總結（1 分鐘看完全場） 這場在講什麼？（先用生活例子） 1 part 1：做好一個 ai 助手，難在哪？（2:41–19:13） 2 part 2：客戶變多了，要蓋平台（19:14–52:40） 3 part 3：如果連「聊天」都不需要呢？（52:41–63:06） 三句話帶走（63:07–64:09） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "will-harness-engineering",
@@ -565,7 +565,7 @@ window.PN_DATA = {
     "主題/Harness工程",
     "主題/成本控管",
     "主題/團隊導入",
-    "用途/案例故事"
+    "用途/案例分享"
    ],
    "keywords": [],
    "glossary": [
@@ -603,7 +603,7 @@ window.PN_DATA = {
    "figs": 18,
    "owner": "terry",
    "visibility": "team",
-   "hay": "駕馭工程必須熟知的兩三事 will 保哥（多奇數位創意 技術總監） 一個老闆的實戰與帳單：工具少即是多（15→2 快 3.5 倍）、一個工程師一天燒 3.7 億 token、公司月費 15000 美金到週費 13 美金。驗證是 harness 的心臟。 2026 generative ai 年會 開發者年會 gaiconf 深入 harness工程 成本控管 團隊導入 案例故事 主題/harness工程 主題/成本控管 主題/團隊導入 用途/案例故事 harness（駕馭工程） loop engineering（迴圈工程） ai agent（ai 代理人） sensor（感測器／回饋） guide（導引） constraint（限制） agents.md skill（技能包） subagent（子代理／分身） context rot（上下文腐爛） context window（腦容量） llm-as-a-judge（ai 當裁判） 自我偏好偏差 dreaming（做夢） lsp（language server protocol） vibe coding sdd（規格先行開發） chrome devtools protocol telemetry（遙測） human-in-the-loop mock data（模擬資料） fomo（錯失恐懼） 先講清楚：「馬具」是什麼？ 三個實證：這件事到底有多大差別 他在意的三件事（很誠實） 真實帳單（這段最值錢） 他的省錢絕招：把算力借給 chatgpt 網站 馬具的六個層次 驗證是馬具的心臟 上下文腐爛，與「分身」解法 實際怎麼開始 全場的真心話：最大的限制在人自己身上 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "駕馭工程必須熟知的兩三事 will 保哥（多奇數位創意 技術總監） 一個老闆的實戰與帳單：工具少即是多（15→2 快 3.5 倍）、一個工程師一天燒 3.7 億 token、公司月費 15000 美金到週費 13 美金。驗證是 harness 的心臟。 2026 generative ai 年會 開發者年會 gaiconf 深入 harness工程 成本控管 團隊導入 案例分享 主題/harness工程 主題/成本控管 主題/團隊導入 用途/案例分享 harness（駕馭工程） loop engineering（迴圈工程） ai agent（ai 代理人） sensor（感測器／回饋） guide（導引） constraint（限制） agents.md skill（技能包） subagent（子代理／分身） context rot（上下文腐爛） context window（腦容量） llm-as-a-judge（ai 當裁判） 自我偏好偏差 dreaming（做夢） lsp（language server protocol） vibe coding sdd（規格先行開發） chrome devtools protocol telemetry（遙測） human-in-the-loop mock data（模擬資料） fomo（錯失恐懼） 先講清楚：「馬具」是什麼？ 三個實證：這件事到底有多大差別 他在意的三件事（很誠實） 真實帳單（這段最值錢） 他的省錢絕招：把算力借給 chatgpt 網站 馬具的六個層次 驗證是馬具的心臟 上下文腐爛，與「分身」解法 實際怎麼開始 全場的真心話：最大的限制在人自己身上 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "ihower-harness-loop-engineering",
@@ -624,7 +624,7 @@ window.PN_DATA = {
    "tags": [
     "主題/Harness工程",
     "主題/AI代理人",
-    "用途/建立觀念"
+    "用途/觀念建立"
    ],
    "keywords": [],
    "glossary": [
@@ -660,7 +660,7 @@ window.PN_DATA = {
    "figs": 17,
    "owner": "terry",
    "visibility": "team",
-   "hay": "給 agent 開發者的 harness + loop engineering 張文鈿 ihower（愛好資訊科技 ai engineer） ai 最常見的失敗是「沒做完卻宣稱完成」。這場把「怎麼盯住 ai」拆成四個可以插入回饋的時間點：工具內、兩次呼叫之間、每輪結束、整個重來。 2026 generative ai 年會 開發者年會 gaiconf 深入 harness工程 ai代理人 建立觀念 主題/harness工程 主題/ai代理人 用途/建立觀念 ai agent（ai 代理人） harness（駕馭工程） loop engineering（迴圈工程） turn（一輪） function calling（函式呼叫） deep agent sub-agent（分身） context window（腦容量） 前饋 回饋 運算式檢查 llm-as-a-judge（ai 當裁判） steering（引導） human-in-the-loop（等人回答） goal（目標契約） grader（獨立評分員） transcript（對話記錄） stop hook ralph heartbeat（心跳排程） rsi（遞迴自我改進） model-harness-fit context offloading（卸載） rag（知識庫問答） sqlglot 幻覺 大綱總結（1 分鐘看完全場） 為什麼需要這個？（4:51–5:15） 核心觀念（5:16–11:35） 全場核心：回饋可以插在四個時間點 2 時間點二：兩次呼叫之間（24:38–29:36） 3 時間點三：每輪結束（29:37–44:23） 4 時間點四：整個重來（44:24–54:24） 三個進階提醒（54:25–61:00） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "給 agent 開發者的 harness + loop engineering 張文鈿 ihower（愛好資訊科技 ai engineer） ai 最常見的失敗是「沒做完卻宣稱完成」。這場把「怎麼盯住 ai」拆成四個可以插入回饋的時間點：工具內、兩次呼叫之間、每輪結束、整個重來。 2026 generative ai 年會 開發者年會 gaiconf 深入 harness工程 ai代理人 觀念建立 主題/harness工程 主題/ai代理人 用途/觀念建立 ai agent（ai 代理人） harness（駕馭工程） loop engineering（迴圈工程） turn（一輪） function calling（函式呼叫） deep agent sub-agent（分身） context window（腦容量） 前饋 回饋 運算式檢查 llm-as-a-judge（ai 當裁判） steering（引導） human-in-the-loop（等人回答） goal（目標契約） grader（獨立評分員） transcript（對話記錄） stop hook ralph heartbeat（心跳排程） rsi（遞迴自我改進） model-harness-fit context offloading（卸載） rag（知識庫問答） sqlglot 幻覺 大綱總結（1 分鐘看完全場） 為什麼需要這個？（4:51–5:15） 核心觀念（5:16–11:35） 全場核心：回饋可以插在四個時間點 2 時間點二：兩次呼叫之間（24:38–29:36） 3 時間點三：每輪結束（29:37–44:23） 4 時間點四：整個重來（44:24–54:24） 三個進階提醒（54:25–61:00） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "limuyue-46-to-90",
@@ -682,7 +682,7 @@ window.PN_DATA = {
     "主題/AI寫作",
     "主題/AI代理人",
     "主題/脈絡工程",
-    "用途/照著做"
+    "用途/實作教學"
    ],
    "keywords": [],
    "glossary": [
@@ -716,7 +716,7 @@ window.PN_DATA = {
    "figs": 16,
    "owner": "terry",
    "visibility": "team",
-   "hay": "從 46 分寫到 90 分 — ai 代理人寫作 李慕約（generative ai 年會 策展人） 把「請 ai 寫文章」做成流水線：指令×脈絡×工具。餵更少反而更好、刪除比補強難、多 agent 要有可觀測儀表板。 2026 generative ai 年會 年會（主會場） gaiconf 進階 ai寫作 ai代理人 脈絡工程 照著做 主題/ai寫作 主題/ai代理人 主題/脈絡工程 用途/照著做 ai agent（ai 代理人） 指令 prompt 脈絡 context 工具 harness 反思流程 whisper ocr system prompt（系統提示） api claude / opus / fable claude code codex ghost blog 可觀測性 / 儀表板 編輯污染 為什麼要教 ai 寫文章？（他的親身故事） 貫穿全場的三個關鍵字（先記這個就好） 1 聽寫：把演講錄音變逐字稿（0:00–3:47） 2 寫稿＋反思流程：這段最關鍵（3:47–8:30） 3 脈絡（食材）的四招：餵什麼、怎麼餵（8:30–15:00） 4 上稿與把關（工具／爐具）（15:00–20:02） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "從 46 分寫到 90 分 — ai 代理人寫作 李慕約（generative ai 年會 策展人） 把「請 ai 寫文章」做成流水線：指令×脈絡×工具。餵更少反而更好、刪除比補強難、多 agent 要有可觀測儀表板。 2026 generative ai 年會 年會（主會場） gaiconf 進階 ai寫作 ai代理人 脈絡工程 實作教學 主題/ai寫作 主題/ai代理人 主題/脈絡工程 用途/實作教學 ai agent（ai 代理人） 指令 prompt 脈絡 context 工具 harness 反思流程 whisper ocr system prompt（系統提示） api claude / opus / fable claude code codex ghost blog 可觀測性 / 儀表板 編輯污染 為什麼要教 ai 寫文章？（他的親身故事） 貫穿全場的三個關鍵字（先記這個就好） 1 聽寫：把演講錄音變逐字稿（0:00–3:47） 2 寫稿＋反思流程：這段最關鍵（3:47–8:30） 3 脈絡（食材）的四招：餵什麼、怎麼餵（8:30–15:00） 4 上稿與把關（工具／爐具）（15:00–20:02） 對南瓜的用處 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   },
   {
    "slug": "hermes-agent-line",
@@ -737,7 +737,7 @@ window.PN_DATA = {
    "tags": [
     "主題/AI代理人",
     "主題/自動化",
-    "用途/照著做",
+    "用途/實作教學",
     "關聯/自動化流程"
    ],
    "keywords": [],
@@ -772,7 +772,7 @@ window.PN_DATA = {
    "figs": 13,
    "owner": "terry",
    "visibility": "team",
-   "hay": "把 ai 小助手裝進 line（hermes 接 line 完整教學） 網際之星開發實驗室 4 步驟把會做事的 ai 接上 line：申請金鑰→ngrok 打通 webhook→填設定→手機實測。含三大卡關重點。 youtube 精選 youtube 深入 ai代理人 自動化 照著做 自動化流程 主題/ai代理人 主題/自動化 用途/照著做 關聯/自動化流程 ai agent（ai 代理人） skill（技能） line developers provider（提供者） channel（頻道） messaging api channel secret（頻道密鑰） channel access token（存取金鑰） webhook（網路門鈴） ngrok（臨時公開地址） https 網址 port（連接埠） allowed ids（白名單） line user id hermes gateway（閘道） gpt image 2 verify（驗證） 大綱總結（30 秒看完） 這到底在做什麼？（用生活例子講） 1 第一步：去拿兩把鑰匙（0:53–5:07） 2 第二步：幫電腦開一條「外面進得來的路」（5:07–6:40） 3 第三步：把鑰匙填進 ai 的設定裡（6:40–8:07） 4 第四步：拿手機來玩玩看（8:07–13:50） 三個最常卡住的地方（照做就不會錯） 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
+   "hay": "把 ai 小助手裝進 line（hermes 接 line 完整教學） 網際之星開發實驗室 4 步驟把會做事的 ai 接上 line：申請金鑰→ngrok 打通 webhook→填設定→手機實測。含三大卡關重點。 youtube 精選 youtube 深入 ai代理人 自動化 實作教學 自動化流程 主題/ai代理人 主題/自動化 用途/實作教學 關聯/自動化流程 ai agent（ai 代理人） skill（技能） line developers provider（提供者） channel（頻道） messaging api channel secret（頻道密鑰） channel access token（存取金鑰） webhook（網路門鈴） ngrok（臨時公開地址） https 網址 port（連接埠） allowed ids（白名單） line user id hermes gateway（閘道） gpt image 2 verify（驗證） 大綱總結（30 秒看完） 這到底在做什麼？（用生活例子講） 1 第一步：去拿兩把鑰匙（0:53–5:07） 2 第二步：幫電腦開一條「外面進得來的路」（5:07–6:40） 3 第三步：把鑰匙填進 ai 的設定裡（6:40–8:07） 4 第四步：拿手機來玩玩看（8:07–13:50） 三個最常卡住的地方（照做就不會錯） 專有名詞小辭典（看不懂的詞來這裡查） 延伸閱讀（跟這篇有關的其他筆記）"
   }
  ]
 };

@@ -23,7 +23,7 @@ window.PN = window.PN || {};
   var sb = null;
   PN.mode = hasKey ? 'supabase' : 'demo';
 
-  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe', trash: 'pnTrash', cover: 'pnCover' };
+  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe', trash: 'pnTrash', cover: 'pnCover', shelfNames: 'pnShelfNames', tagRename: 'pnTagRename' };
   function rd(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function wr(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function D() { return window.PN_DATA || { reports: [], bySlug: {}, shelves: [], tagFamilies: [], profiles: [] }; }
@@ -137,6 +137,12 @@ window.PN = window.PN || {};
     if (PN.mode === 'demo') {                 /* 示範模式：垃圾桶與自訂封面都在這台瀏覽器 */
       var tr = rd(K.trash, {}), cv = rd(K.cover, {});
       C.notes.forEach(function (c) { if (tr[c.slug]) { c.deletedAt = tr[c.slug].at; c.deletedBy = tr[c.slug].by; } if (cv[c.slug]) c.cover = cv[c.slug]; });
+      var sn = rd(K.shelfNames, {}), tm = rd(K.tagRename, {});
+      C.shelves.forEach(function (s) { if (sn[s.id]) s.name = sn[s.id]; });
+      C.notes.forEach(function (c) {
+        if (sn[c.shelf]) c.shelfName = sn[c.shelf];
+        c.tags = (c.tags || []).map(function (t) { return tm[t] || t; });
+      });
     }
     C.profiles = (d.profiles || []).map(function (p) { return Object.assign({}, p); });
     C.profById = {}; C.profiles.forEach(function (p) { C.profById[p.slug] = p; });
@@ -301,6 +307,40 @@ window.PN = window.PN || {};
         if (r && r.error) warn('存不了最愛：' + r.error.message);
         return on;
       }, function (e) { warn('存不了最愛', e); return on; });
+    },
+
+    /* ── 書架與標籤改名（owner；示範模式存瀏覽器） ── */
+    canManage: function () {
+      if (PN.mode === 'demo') return true;
+      return live() && !!C.profile && C.profile.role === 'owner';
+    },
+    vocab: function () {
+      var out = {};
+      C.notes.forEach(function (r) {
+        (r.tags || []).forEach(function (t) {
+          var i = t.indexOf('/'); if (i < 0) return;
+          var f = t.slice(0, i), v = t.slice(i + 1);
+          (out[f] = out[f] || []); if (out[f].indexOf(v) < 0) out[f].push(v);
+        });
+      });
+      Object.keys(out).forEach(function (f) { out[f].sort(); });
+      return out;
+    },
+    renameShelf: function (id, name) {
+      C.shelves.forEach(function (s) { if (s.id === id) s.name = name; });
+      C.notes.forEach(function (r) { if (r.shelf === id) r.shelfName = name; });
+      if (!live()) { var sn = rd(K.shelfNames, {}); sn[id] = name; wr(K.shelfNames, sn); return Promise.resolve(true); }
+      return Promise.resolve(sb.from('shelves').update({ name: name }).eq('id', id))
+        .then(function (x) { if (x && x.error) { warn('書架改名失敗：' + x.error.message); return false; } return true; },
+          function (e) { warn('書架改名失敗', e); return false; });
+    },
+    renameTag: function (family, oldV, newV) {
+      var from = family + '/' + oldV, to = family + '/' + newV;
+      C.notes.forEach(function (r) { r.tags = (r.tags || []).map(function (t) { return t === from ? to : t; }); });
+      if (!live()) { var tm = rd(K.tagRename, {}); tm[from] = to; wr(K.tagRename, tm); return Promise.resolve(true); }
+      return Promise.resolve(sb.rpc('rename_tag', { p_family: family, p_old: oldV, p_new: newV }))
+        .then(function (x) { if (x && x.error) { warn('標籤改名失敗：' + x.error.message); return false; } return true; },
+          function (e) { warn('標籤改名失敗', e); return false; });
     },
 
     /* ── 垃圾桶（保留 14 天；團隊共筆的話夥伴都能復原） ── */

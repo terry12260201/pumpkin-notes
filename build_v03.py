@@ -453,7 +453,6 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
 
 <div class="pn-tools" role="toolbar" aria-label="這篇筆記的工具">
   <a class="pn-tools__back" href="%%HOME%%#library"><svg><use href="#i-left"/></svg><span>回書架</span></a>
-  <span class="pn-tools__brand">%%LOGO%%</span>
   <span class="pn-tools__t">%%STRONG%%</span>
   <div class="pn-tools__r">
     <button class="pn-tbtn" data-act="fav" aria-pressed="false" title="加入我的最愛"><svg><use href="#i-heart"/></svg><span class="pn-tbtn__l">收藏</span></button>
@@ -521,9 +520,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
 </div>
 <div class="toast" id="pn-toast" role="status" aria-live="polite"></div>
 
-<script src="%%UP%%data/config.js"></script>
-<script src="%%UP%%data/reports.js"></script>
-<script src="%%UP%%data/store.js"></script>
+<script src="%%UP%%data/config.js?v=20260918b"></script>
+<script src="%%UP%%data/reports.js?v=20260918b"></script>
+<script src="%%UP%%data/store.js?v=20260918b"></script>
 <script>
 (function(){
   var slug=document.querySelector('meta[name="pn:slug"]').content;
@@ -562,6 +561,8 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
     S.ready().then(function(){
       paint();
       S.markRead(slug);
+      var r0=S.get(slug),ci=document.querySelector('figure.cover img');
+      if(r0&&ci&&r0.cover&&/^(https?:|data:)/.test(r0.cover))ci.src=r0.cover;
       var m0=document.getElementById('pn-mine');
       if(m0)m0.value=S.getTakeaway(slug)||'';
       var s2=document.getElementById('pn-mine-s');
@@ -592,7 +593,10 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
   cvBtn.addEventListener('click',function(){cvFile.click();});
   cvFile.addEventListener('change',function(){
     var f=cvFile.files[0];if(!f)return;toast('封面處理中…');
-    Promise.resolve(S.setCover(slug,f)).then(function(ok){toast(ok?'封面換好了，書架上會看到新的':'封面沒換成，再試一次');cvFile.value='';});
+    Promise.resolve(S.setCover(slug,f)).then(function(ok){
+      toast(ok?'封面換好了，書架上會看到新的':'封面沒換成，再試一次');cvFile.value='';
+      if(ok){var r=S.get(slug),ci=document.querySelector('figure.cover img');if(r&&ci&&r.cover)ci.src=r.cover;}
+    });
   });
   /* 刪除：先確認，放進垃圾桶後回到「我的 → 垃圾桶」 */
   var dm=document.getElementById('pn-del');
@@ -916,7 +920,7 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
   .pn-article figure img{max-height:11cm;object-fit:contain}
   .pn-report .cover{box-shadow:none}
   .pn-article a{text-decoration:none}
-  .pn-foot::after{content:"原片：" attr(data-src) "　·　小南瓜數位筆記｜南瓜虛擬科技";display:block;margin-top:10px;font-size:11px;color:#777}
+  .pn-foot::after{content:"原片：" attr(data-src) "　·　Pumpkin Notes｜南瓜虛擬科技";display:block;margin-top:10px;font-size:11px;color:#777}
 }
 """
 
@@ -924,6 +928,26 @@ body.pn-report{background-image:none}            /* 點格改用 canvas 畫（�
 # ⚠️ Phase 2 起 data/store.js（雙模式資料層：Supabase ／ 離線示範）改成手維護，
 #    不再由這支產生，這裡也不要再覆蓋它。同理 data/config.js（後端網址與 anon key）。
 
+
+
+TAG_RENAME = {"用途/照著做": "用途/實作教學", "用途/建立觀念": "用途/觀念建立", "用途/案例故事": "用途/案例分享"}
+
+def externalize_images(html_text, dst):
+    """把 base64 內嵌圖抽成 img/<slug>/NN.jpg：報告 HTML 從 1～2 MB 變 60 KB，按鈕不用等整頁載完。"""
+    slug = dst.stem
+    img_dir = dst.parent / "img" / slug
+    n = [0]
+    def rep(m):
+        n[0] += 1
+        ext = {"jpeg": "jpg", "png": "png", "webp": "webp"}.get(m.group(1), "jpg")
+        img_dir.mkdir(parents=True, exist_ok=True)
+        p = img_dir / f"{n[0]:02d}.{ext}"
+        import base64 as _b
+        p.write_bytes(_b.b64decode(m.group(2)))
+        return f'src="img/{slug}/{p.name}" loading="lazy" decoding="async"'
+    out = re.sub(r'src="data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)"', rep, html_text)
+    out = out.replace(' loading="lazy" loading="lazy"', ' loading="lazy"')
+    return out
 
 def build_data_js(data, reports, metas, out):
     shelves = data.get("shelves", [])
@@ -998,6 +1022,8 @@ def main():
         sys.exit("❌ 來源不能是 V03 自己")
     data = json.loads((src / "reports.json").read_text(encoding="utf-8"))
     reports = data["reports"]
+    for _rp in reports:
+        _rp["tags"] = [TAG_RENAME.get(t, t) for t in _rp.get("tags", [])]
     shelves = data.get("shelves", [])
     shelf_name = {s["id"]: s["name"] for s in shelves}
     sec_name = {(s["id"], x["id"]): x["name"] for s in shelves for x in s.get("sections", [])}
@@ -1027,6 +1053,8 @@ def main():
             continue
         dst = HERE / rp["file"]
         dst.parent.mkdir(parents=True, exist_ok=True)
+        out = externalize_images(out, dst)
+        out = re.sub(r'<a (?![^>]*target=)([^>]*href="https?://[^"]*"[^>]*)>', r'<a \1 target="_blank" rel="noopener">', out)
         dst.write_text(out, encoding="utf-8")
         ok += 1
 

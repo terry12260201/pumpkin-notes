@@ -244,6 +244,29 @@ def cover_bytes(meta, work):
     im = im.resize((640, round(im.height * 640 / im.width)))
     b = io.BytesIO(); im.save(b, "JPEG", quality=82); return b.getvalue()
 
+
+SITE = RAW.get("site_url") or "https://terry12260201.github.io/pumpkin-notes/"
+def reskin_v03(html, slug_db, data, meta, shelf):
+    """套上 V03 墨金樣式（工具列、點格、回書架），連結一律指向正式網址；失敗就退回原樣。"""
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        import build_v03 as B
+        rp = {"file": f"cloud/{slug_db}.html", "title": data["h1"], "speaker": meta.get("uploader", ""),
+              "source": "YouTube" if (meta.get("url") or "").startswith("http") else "錄影",
+              "duration": meta.get("duration", ""), "date": date.today().isoformat(),
+              "summary": re.sub(r"<[^>]+>", "", data["one_liner"])[:140], "cover": "",
+              "tags": [f"主題/{t}" for t in data["tags"].get("topic", [])[:3]] + [f"用途/{data['tags'].get('use','')}"],
+              "shelf": shelf, "section": ""}
+        m = B.scan_report(html)
+        out = B.reskin_report(html, rp, [rp], m, {shelf: shelf}, {}, depth_prefix=SITE)
+        if not out: raise RuntimeError("reskin 回空")
+        out = re.sub(r'name="pn:slug" content="[^"]*"', f'name="pn:slug" content="{slug_db}"', out)
+        out = re.sub(r"var slug\s*=\s*['\"][^'\"]*['\"]", f"var slug='{slug_db}'", out)
+        return out
+    except Exception as e:
+        log("⚠️ 套 V03 樣式失敗，先用原樣上架：", e)
+        return html.replace('href="../index.html', 'href="' + SITE + 'index.html')
+
 # ─────────────────────────── 主流程 ───────────────────────────
 def process(job):
     jid, uid = job["id"], job["owner_id"]
@@ -258,8 +281,8 @@ def process(job):
     ok, report = check(html_path)
     log(("✅ 驗收通過" if ok else "⚠️ 驗收有黃燈，照樣上架：") + ("" if ok else report[-300:]))
     patch_job(jid, status="publishing", progress_msg="正在上架")
-    html = html_path.read_text(encoding="utf-8")
     slug_db = f"{date.today().isoformat()}_{jid[:8]}"          # Storage 的路徑只能 ASCII，中文標題放 notes.title
+    html = reskin_v03(html_path.read_text(encoding="utf-8"), slug_db, data, meta, shelf)
     html_p = f"{uid}/{slug_db}.html"; upload("notes", html_p, html.encode("utf-8"), "text/html; charset=utf-8")
     cover_p = ""
     cb = cover_bytes(meta, Path(meta["_work"]))

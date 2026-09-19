@@ -1529,6 +1529,13 @@ body[data-theme="night"] .card__cv img{filter:none}
   /* ── 綁事件 ── */
   function bind() {
     addEventListener('hashchange', route);
+    /* 存在雲端的筆記：卡片連結是 #open?slug=…，要先換簽名網址再開 */
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href^="#open?"]'); if (!a) return;
+      e.preventDefault();
+      var m = a.getAttribute('href').match(/slug=([^&]+)/);
+      if (m) openNote(decodeURIComponent(m[1]));
+    });
     document.addEventListener('click', function (e) {
       if ($('#me-menu') && !e.target.closest('#me-wrap')) $('#me-menu').remove();
       if ($('#login-pop') && !e.target.closest('#me-wrap')) closePop();

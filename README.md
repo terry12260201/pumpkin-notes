@@ -36,3 +36,9 @@ Phase 1 的「夥伴」與「團隊分享」是示意資料，登入功能接上
 新增 `assets/directory-v1.1.css` 與 `assets/marks/` 原創主題圖示。原始資料、筆記內頁與封面均未改寫。
 首頁正本仍是手寫 `index.html`；不要用舊備份重建覆蓋。舊版首頁備份在 `_qa/index-before-ink-gold-v1.1.html`。
 本次localhost響應式與操作檢查完成；file://被自動瀏覽器規則封鎖，尚未完成雙擊驗證。正式登入與收件匣後端仍屬既有待實作範圍。
+
+## 整理主機（worker，Phase 3）
+網站收件匣按「開始整理」只是排隊；真正下載影片、抽幀、請 Claude 寫筆記、上架，是本機的 `worker/worker.py` 在做。
+1. 第一次：雙擊 `worker/worker_setup.command`，貼 Supabase secret key 與 Claude API key（只存本機 `~/.config/pumpkin-notes/config.json`）。
+2. 之後：雙擊 `worker/啟動整理主機.command`，視窗開著就會每 30 秒接單；關掉就停。
+3. 流程：queued → prepping（yt-dlp／ffmpeg）→ writing（`claude-opus-5`，effort high）→ checking（check_report.py）→ publishing（Storage＋notes 表）→ done；失敗會標 failed 並把原因顯示在收件匣。

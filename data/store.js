@@ -542,9 +542,22 @@ window.PN = window.PN || {};
       if (!r.needUrl) return Promise.resolve(r.file);
       if (!live()) return Promise.resolve('');
       var path = (r.htmlPath || '').replace(/^notes\//, '');
+      /* Supabase Storage 把 .html 一律當純文字送（content-type: text/plain，且不帶 charset），
+         直接開簽名網址會看到原始碼＋中文亂碼。所以先把檔案抓下來，
+         再包成 text/html 的 Blob 網址交給瀏覽器顯示。 */
       return Promise.resolve(sb.storage.from('notes').createSignedUrl(path, 3600))
-        .then(function (x) { return (x && x.data && x.data.signedUrl) || ''; },
-          function (e) { warn('拿不到報告網址', e); return ''; });
+        .then(function (x) {
+          var u = (x && x.data && x.data.signedUrl) || '';
+          if (!u) return '';
+          return fetch(u).then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.arrayBuffer();
+          }).then(function (buf) {
+            var html = new TextDecoder('utf-8').decode(buf);
+            return URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+          });
+        }, function (e) { warn('拿不到報告網址', e); return ''; })
+        .catch(function (e) { warn('抓不到報告檔', e); return ''; });
     }
   };
   PN.store = store;

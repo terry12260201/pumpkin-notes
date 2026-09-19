@@ -286,7 +286,7 @@ def reskin_report(src_html, rp, reports, meta, shelf_name, sec_name, depth_prefi
     # 1) 拆出 V01 的各區塊
     m_cover = re.search(r'<figure class="cover">(.*?)</figure>', s, re.S)
     m_hero = re.search(r'<header class="hero">(.*?)</header>', s, re.S)
-    m_toc = re.search(r'<nav class="toc">(.*?)</nav>', s, re.S)
+    m_toc = re.search(r'<nav class="toc"[^>]*>(.*?)</nav>', s, re.S)
     m_body = re.search(r"</nav>(.*)<footer>(.*?)</footer>", s, re.S)
     if not (m_hero and m_toc and m_body):
         return None
@@ -530,9 +530,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
 </div>
 <div class="toast" id="pn-toast" role="status" aria-live="polite"></div>
 
-<script src="%%UP%%data/config.js?v=20260918b"></script>
-<script src="%%UP%%data/reports.js?v=20260918b"></script>
-<script src="%%UP%%data/store.js?v=20260918b"></script>
+<script src="%%UP%%data/config.js?v=20260920a"></script>
+<script src="%%UP%%data/reports.js?v=20260920a"></script>
+<script src="%%UP%%data/store.js?v=20260920a"></script>
 <script>
 (function(){
   var slug=document.querySelector('meta[name="pn:slug"]').content;

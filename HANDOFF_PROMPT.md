@@ -44,3 +44,16 @@
 3. 網址不要露出個人 GitHub 帳號：最快是幫 Pages 綁公司網域子網域（例如 notes.pumpkinvr.com，DNS 加 CNAME 指到 terry12260201.github.io，repo Settings → Pages → Custom domain），Supabase 的 Site URL／Redirect URLs 與 `data/config.js` 的 siteUrl 要一起改；或把 repo 轉到公司 GitHub 組織。Cursor Agents 不是網站託管，不適用。
 4. 整理主機要 24 小時服務：把 `worker/` 搬到 PC-01 用排程或 launchd 常駐。
 5. Obsidian 回寫：南瓜自己的筆記上架後同時 `note_lib.save()` 進 vault（還沒接）。
+
+## 7. 2026-09-20 進度（接手先讀這段，§6 的 1 已完成）
+**這輪修好**（commit a2c289d，已上線）
+- 雲端筆記點開變原始碼＋亂碼：根因是 Supabase Storage 對 `.html` 一律回 `content-type: text/plain` 且不帶 charset（安全政策，改不了）。解法：`store.noteUrl()` 先 `fetch` 簽名網址，再包成 `text/html;charset=utf-8` 的 Blob 網址交給瀏覽器。CORS 已確認 `access-control-allow-origin: *`。
+- `build_v03.reskin_report` 抓不到 `<nav class="toc" id="toc">`（report_lib 產的 nav 帶 id）→ 改 `[^>]*`。第一篇雲端筆記已重新換皮上傳（有工具列＋點格）。
+- 快取版本 `?v=20260920a`（index、build_v03、24 篇靜態頁）。
+
+**待辦（照順序）**
+1. **公司網域**：DNS 在 Wix（`ns0/ns1.wixdns.net`）。`notes.pumpkinvr.com` **已有一筆 CNAME 指到 `cname.vercel-dns-0.com`**（目前打不開，疑似舊設定），要南瓜決定：改這筆指到 `terry12260201.github.io`，或另用 `pn.pumpkinvr.com`（目前空著）。DNS 好了之後：`gh api -X PUT repos/terry12260201/pumpkin-notes/pages -f cname=<網域>` → 等 HTTPS 憑證 → 改 `data/config.js siteUrl`、`worker.py SITE`、Supabase Authentication → URL Configuration 的 Site URL 與 Redirect URLs、Google OAuth 同意畫面的授權網域。
+2. **Google 雲端存放（規劃定案，待南瓜給憑證）**：在公司 Google Drive 建共用資料夾 `Pumpkin Notes 素材庫/`，底下 `報告HTML/`、`封面/`、`截圖幀/<slug>/`、`夥伴上傳/`；worker 上架後多一步用 Drive API 上傳（HTML、封面 jpg、幀 jpg）。憑證走 **服務帳戶**：GCP 專案 `pumpkin-meeting-platform` → IAM → 服務帳戶 → 建立 → 金鑰 JSON 存 `~/.config/pumpkin-notes/drive_sa.json`；把資料夾分享給服務帳戶信箱（編輯者）即可，不用 domain-wide delegation。夥伴自己拍的照片直接丟 `夥伴上傳/`，worker 之後可掃該夾當錄影檔來源。
+3. **24 小時整理主機**：現況 jobs 是排隊制，電腦沒開只是延後不會掉單。路線：短期 Mac → 中期搬 PC-01（launchd／工作排程器常駐）→ 長期租小主機（Hetzner／Oracle 免費層）。GitHub Actions 排程可行但 YouTube 常擋雲端 IP，需 cookies，不建議當主力。
+4. Obsidian 回寫（§6 第 5 點）。
+5. 墨金 skill 有兩份 v1.2 要合併：GPT/Codex 在 `~/GitHub/pumpkin-ink-gold` 工作區寫的（未 commit，`references/ink-gold-ui.js` 磁吸點陣＋Phosphor 圖示＋Logo）與 Fable 在 `~/.claude/skills/pumpkin-ink-gold/references/互動點格與品牌.md` 寫的（Pumpkin Notes 定案參數）。合併後再同步 OB／私有 pumpkin-skills／公開庫。

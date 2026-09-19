@@ -14,6 +14,14 @@
 第一次請跑 worker_setup.command 貼金鑰。
 """
 import base64, io, json, os, re, subprocess, sys, time, socket, urllib.request, urllib.parse, urllib.error
+import ssl
+try:                                   # Mac 的 python.org 版沒帶根憑證：用 certifi 的
+    import certifi
+    _SSL = ssl.create_default_context(cafile=certifi.where())
+except Exception:
+    _SSL = ssl.create_default_context()
+_opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=_SSL))
+urllib.request.install_opener(_opener)
 from datetime import date
 from pathlib import Path
 

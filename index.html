@@ -1604,6 +1604,7 @@ body[data-theme="night"] .card__cv img{filter:none}
     renderNav();
     bind();
     if (!auth.live() || !auth.on() || PN.auth.allowed()) { $('#login-box').innerHTML = loginHTML('lg2', true); bindLogin('lg2'); }
+    if (PN.authError) { setTimeout(function () { toast('登入失敗：' + PN.authError); }, 600); }
     var fl = null; try { fl = localStorage.getItem('pnFlash'); if (fl) { localStorage.removeItem('pnFlash'); st.me = 'trash'; } } catch (e) {}
     route();
     if (fl) toast(fl);

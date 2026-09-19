@@ -269,7 +269,9 @@ window.PN = window.PN || {};
     }).then(function (res) {
       C.user = (res && res.data && res.data.session && res.data.session.user) || null;
       /* 從信件連結進來：網址上的 token 已被讀走，清掉免得被當成路由 */
-      if (/access_token=|refresh_token=|type=(signup|magiclink|recovery)/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + '#library'); } catch (e) { location.hash = 'library'; } }
+      var em = location.hash.match(/error_description=([^&]+)/);
+      if (em) { PN.authError = decodeURIComponent(em[1].replace(/\+/g, ' ')); try { console.warn('登入失敗：' + PN.authError); } catch (e) {} }
+      if (/access_token=|refresh_token=|error=|type=(signup|magiclink|recovery)/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + '#library'); } catch (e) { location.hash = 'library'; } }
       return loadAll();
     }).catch(function (e) {
       warn('連不上 Supabase，先用離線資料', e);

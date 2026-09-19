@@ -104,7 +104,9 @@ SPEC = """你是「Pumpkin Notes」的筆記編輯。把一支影片整理成國
 - tags：topic 從這些選 1～3 個：AI代理人、Harness工程、VibeCoding、脈絡工程、團隊導入、自動化、資料分析、AI寫作、MCP、成本控管、產品上線、資安邊界（都不合再自創 2～6 字、不能有空格）；use 從 實作教學、觀念建立、案例分享、工具評測 選 1 個。
 - level：入門（不需背景）／進階（要先懂基本名詞）／深入（給已在做的人）。
 - 內文段落用 HTML：<p>、<ul><li>、<div class="note">💡 小提醒</div>、<table>；不要 <h2>（標題由 heading 給）。
-只輸出 JSON，不要多餘文字。"""
+輸出格式（只輸出這個 JSON，鍵名一字不差）：
+{"h1":"一句人話標題","one_liner":"全場最重要的一句話","level":"入門|進階|深入","tags":{"topic":["…"],"use":"…"},"keywords":["…"],"glossary":[{"id":"agent","term":"AI Agent（AI 代理人）","plain":"白話解釋"}],"sections":[{"id":"s1","heading":"段落標題","range":"0:00–3:47","html":"<p>…</p>","figures":[{"sec":30,"caption":"這張在講什麼"}]}],"takeaways":["句1","句2","句3"],"verdict":{"pill":"看報告就夠|值得看原片|挑段看","why":"…"},"action":"看完可以做的一件事","for_team":["對團隊的用處"]}
+"""
 
 SCHEMA = {
   "type": "object", "additionalProperties": False,
@@ -125,7 +127,7 @@ SCHEMA = {
                                 "html": {"type": "string"},
                                 "figures": {"type": "array", "items": {"type": "object", "additionalProperties": False,
                                             "required": ["sec", "caption"], "properties": {"sec": {"type": "integer"}, "caption": {"type": "string"}}}}}}},
-    "takeaways": {"type": "array", "items": {"type": "string"}, "minItems": 3, "maxItems": 3},
+    "takeaways": {"type": "array", "items": {"type": "string"}, "description": "恰好三句"},
     "verdict": {"type": "object", "additionalProperties": False, "required": ["pill", "why"],
                 "properties": {"pill": {"type": "string"}, "why": {"type": "string"}}},
     "action": {"type": "string", "description": "看完可以做的一件事"},
@@ -162,8 +164,17 @@ def write_with_claude(meta):
         with client.messages.stream(**kwargs) as s:
             msg = s.get_final_message()
     text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
+    (work / "claude_raw.txt").write_text(text, encoding="utf-8")          # 留底，出錯好查
+    log(f"Claude 回覆 {len(text)} 字，stop_reason={msg.stop_reason}")
     m = re.search(r"\{.*\}", text, re.S)
     data = json.loads(m.group(0) if m else text)
+    for a, b in (("title", "h1"), ("one_liner", "one_liner"), ("summary", "one_liner"), ("oneLiner", "one_liner"), ("glossary_list", "glossary")):
+        if a in data and b not in data: data[b] = data[a]                  # 常見的別名
+    if "h1" not in data:                                                   # 有時會多包一層
+        for k, v in data.items():
+            if isinstance(v, dict) and "h1" in v: data = v; break
+    if "h1" not in data:
+        raise RuntimeError("Claude 回的 JSON 缺 h1 等欄位，原文存在 " + str(work / "claude_raw.txt"))
     u = msg.usage
     log(f"Claude 用量：in {u.input_tokens} / out {u.output_tokens} / cache read {getattr(u,'cache_read_input_tokens',0)}")
     return data

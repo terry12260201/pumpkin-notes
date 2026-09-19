@@ -259,7 +259,7 @@ def process(job):
     log(("✅ 驗收通過" if ok else "⚠️ 驗收有黃燈，照樣上架：") + ("" if ok else report[-300:]))
     patch_job(jid, status="publishing", progress_msg="正在上架")
     html = html_path.read_text(encoding="utf-8")
-    slug_db = f"{slug}-{jid[:6]}"
+    slug_db = f"{date.today().isoformat()}_{jid[:8]}"          # Storage 的路徑只能 ASCII，中文標題放 notes.title
     html_p = f"{uid}/{slug_db}.html"; upload("notes", html_p, html.encode("utf-8"), "text/html; charset=utf-8")
     cover_p = ""
     cb = cover_bytes(meta, Path(meta["_work"]))

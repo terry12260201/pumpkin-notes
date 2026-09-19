@@ -16,6 +16,6 @@ window.PN_CONFIG = {
   /* 登入完要導回哪裡（本機開發會自動用 localhost，這個只給正式站用）。
      Supabase → Authentication → URL Configuration 的 Redirect URLs
      要同時填這個網址和 http://localhost:8000/ */
-  siteUrl: 'https://terry12260201.github.io/pumpkin-notes/',
+  siteUrl: 'https://pn.pumpkinvr.com/',
   googleEnabled: true    /* 南瓜在 Supabase 開通 Google 登入後改 true */
 };

@@ -34,3 +34,13 @@
 
 ## 5. 交付格式
 每輪結束回報：改了哪些檔、怎麼驗證（截圖路徑、console 無紅字、`check_report.py` 全綠）、還沒做到的項目。誠實，不美化。
+
+## 6. 2026-09-19 收尾狀態（新視窗接手先讀這段）
+**已可用**：Google 登入（公司帳號）、信箱連結登入、私人／團隊筆記、收藏、已讀、垃圾桶、換封面（裁切）、書架／標籤改名、收件匣排隊 → 本機整理主機（`worker/`）→ Claude（claude-opus-5）寫報告 → 驗收 → 上架；第一支影片已實測全程通過（接單到上架 1 分 40 秒、約 0.15 美金）。
+**設定檔**：`~/.config/pumpkin-notes/config.json` 有 `supabase_service_key`（sb_secret_ 開頭）與 `anthropic_api_key`；不進 repo。
+**還沒做／已知問題（照順序）**
+1. 雲端筆記的報告頁是舊版樣式（沒有工具列與點格）：`worker.reskin_v03()` 呼叫 `build_v03.reskin_report` 會回空，要查 reskin 對 report_lib 產出的結構假設（可能是 `<article>`／章節標記）。修好後 Storage 上的報告會有收藏／分享／刪除工具列。
+2. 截圖與報告存放：目前報告 HTML（含 base64 截圖）與封面存 Supabase Storage（`notes/`、`covers/`），原始幀在本機 `~/PumpkinNotes/work/`。南瓜要求改存公司 Google 雲端：worker 上架後多一步用 Drive API 把 HTML／封面／幀存進指定資料夾（需 service account 或 OAuth 憑證，只有南瓜能給）。
+3. 網址不要露出個人 GitHub 帳號：最快是幫 Pages 綁公司網域子網域（例如 notes.pumpkinvr.com，DNS 加 CNAME 指到 terry12260201.github.io，repo Settings → Pages → Custom domain），Supabase 的 Site URL／Redirect URLs 與 `data/config.js` 的 siteUrl 要一起改；或把 repo 轉到公司 GitHub 組織。Cursor Agents 不是網站託管，不適用。
+4. 整理主機要 24 小時服務：把 `worker/` 搬到 PC-01 用排程或 launchd 常駐。
+5. Obsidian 回寫：南瓜自己的筆記上架後同時 `note_lib.save()` 進 vault（還沒接）。

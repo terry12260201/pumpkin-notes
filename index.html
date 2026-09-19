@@ -1447,6 +1447,10 @@ body[data-theme="night"] .card__cv img{filter:none}
   /* ── 導覽列右側 ── */
   function renderNav() {
     var w = $('#me-wrap');
+    /* 接了 Supabase 但還沒登入：主選單與「新增筆記」先收起來，只留登入 */
+    var gated = auth.live() && !auth.on();
+    if ($('#tabs')) $('#tabs').style.display = gated ? 'none' : '';
+    if ($('#new-note')) $('#new-note').style.display = gated ? 'none' : '';
     if (!auth.on()) {
       w.innerHTML = '<button class="ig-btn ig-btn--line ig-btn--sm" id="btn-login"><svg><use href="#i-user"/></svg>登入</button>';
       $('#btn-login').onclick = function (e) {

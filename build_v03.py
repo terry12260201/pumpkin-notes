@@ -731,7 +731,8 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
   document.querySelector('[data-act="theme"]').addEventListener('click',function(){PN.theme.toggle();});
 
   /* 互動點格背景 */
-  PN.dots(document.getElementById('pn-dots'));
+  /* 點格改用與首頁相同的磁吸版（assets/ink-gold-ui.js） */
+  var ds=document.createElement('script');ds.src='%%HOME%%'.replace(/index\.html$/,'')+'assets/ink-gold-ui.js?v=20260920c';ds.dataset.theme='external';document.body.appendChild(ds);
 })();
 </script>
 </body></html>"""

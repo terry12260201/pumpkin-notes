@@ -1,11 +1,17 @@
-/* Pumpkin Ink & Gold 1.2 · theme + magnetic dot field.
-   Independently implemented from observed interaction; no dependencies. */
+/* Pumpkin Ink & Gold 1.2 · 主題切換 ＋ 互動點格
+   兩種點格模式，用 <body data-dots="…"> 或 <script data-dots="…"> 指定：
+   - magnetic（預設，南瓜 2026-09-20 定案＝Pumpkin Notes 首頁的效果）：16px 細點，像被小磁鐵吸引，
+       往游標靠、沿按鈕輪廓收攏，離開後回到原位。
+   - glow（選用，Pumpkin Notes 報告頁舊版）：點不移動，游標靠近的點變亮、變大。
+   兩種都不用金色、都尊重 prefers-reduced-motion。無外部相依。 */
 (() => {
   'use strict';
   const body = document.body;
   if (!body || body.dataset.igUiReady) return;
   body.dataset.igUiReady = 'true';
   const externalTheme = document.currentScript?.dataset.theme === 'external';
+  const mode = (body.dataset.dots || document.currentScript?.dataset.dots || 'magnetic') === 'glow' ? 'glow' : 'magnetic';
+  body.dataset.dotsMode = mode;
   const toggles = [...document.querySelectorAll('[data-ig-theme-toggle]')];
   const moon = '<path d="M20.5 13a8.7 8.7 0 0 1-9.5-9.5A8.7 8.7 0 1 0 20.5 13Z"/>';
   const sun = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>';
@@ -21,6 +27,7 @@
   if (!externalTheme) {
     let theme = 'day';
     try { if (localStorage.getItem('igTheme') === 'night') theme = 'night'; } catch (_) {}
+    try { const q=new URLSearchParams(location.search).get('theme'); if (q==='night'||q==='day') theme=q; } catch (_) {}
     body.dataset.theme = theme;
     toggles.forEach(b => b.addEventListener('click', () => {
       body.dataset.theme = body.dataset.theme === 'night' ? 'day' : 'night';
@@ -43,10 +50,11 @@
   let active=null, shapes=[];
   const smooth = v => { const t=Math.max(0,Math.min(1,v)); return t*t*(3-2*t); };
   const interactive = 'a,button,summary,[role="button"],select,input,textarea';
-  function enabled(){return !reduce.matches && fine.matches && width>768 && !document.hidden;}
+  function enabled(){return !reduce.matches && fine.matches && (mode==='glow' || width>768) && !document.hidden;}
   function color(){
     const dark=body.dataset.theme==='night';
-    ink=dark?'247,247,247':'45,43,44'; opacity=dark?.18:.3;
+    if(mode==='glow'){ink=dark?'255,255,255':'22,20,21'; opacity=dark?.06:.10;}
+    else{ink=dark?'247,247,247':'45,43,44'; opacity=dark?.18:.3;}
   }
   function size(){
     width=innerWidth; height=innerHeight; scale=Math.min(devicePixelRatio||1,2);
@@ -54,7 +62,7 @@
     canvas.style.width=width+'px';canvas.style.height=height+'px';
     ctx.setTransform(scale,0,0,scale,0,0);
     const responsive=.8+.2*Math.max(0,Math.min(1,(width-360)/408));
-    spacing=16*responsive;radius=.6*responsive;
+    if(mode==='glow'){spacing=24;radius=1;}else{spacing=16*responsive;radius=.6*responsive;}
     if(!enabled()) reset(true); else wake();
     draw();
   }
@@ -76,17 +84,24 @@
     shapes=shapes.slice(-2);
   }
   function hit(){
+    if(mode==='glow'){select(null);return;}
     const el=document.elementFromPoint(pointer.tx,pointer.ty)?.closest(interactive);
     const b=el?.getBoundingClientRect();
     select(el && !el.closest('[data-dots-still]') && b.width*b.height<width*height*.4 ? el : null);
   }
   function draw(){
     ctx.clearRect(0,0,width,height);
-    const startX=-((scrollX%spacing+spacing)%spacing),startY=-((scrollY%spacing+spacing)%spacing);
+    const startX=mode==='glow'?spacing/2:-((scrollX%spacing+spacing)%spacing),startY=mode==='glow'?spacing/2:-((scrollY%spacing+spacing)%spacing);
     const motion=enabled();
     for(let y=startY;y<height+spacing;y+=spacing){
       for(let x=startX;x<width+spacing;x+=spacing){
         let dx=0,dy=0,strength=0;
+        if(mode==='glow'){
+          const k=motion&&pointer.p>.001?Math.max(0,1-Math.hypot(x-pointer.x,y-pointer.y)/140)*pointer.p:0;
+          ctx.beginPath();ctx.arc(x,y,radius*(1+.8*k),0,Math.PI*2);
+          ctx.fillStyle=`rgba(${ink},${(opacity+(.45-opacity)*k).toFixed(3)})`;ctx.fill();
+          continue;
+        }
         if(motion && pointer.p>.001){
           const attraction=smooth(1-Math.hypot(x-pointer.x,y-pointer.y)/160)*pointer.p;
           dx=(pointer.x-x)*.26*attraction;dy=(pointer.y-y)*.26*attraction;strength=attraction;

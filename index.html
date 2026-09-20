@@ -912,9 +912,9 @@ body[data-theme="night"] .card__cv img{filter:none}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data/config.js?v=20260920a"></script>
-<script src="data/reports.js?v=20260920a"></script>
-<script src="data/store.js?v=20260920a"></script>
+<script src="data/config.js?v=20260920d"></script>
+<script src="data/reports.js?v=20260920d"></script>
+<script src="data/store.js?v=20260920d"></script>
 <script>
 /* ── 小南瓜數位筆記 V03：首頁殼 ──────────────────────────────
    路由：#library / #team / #inbox / #me（＋未登入時的 #login）
@@ -1487,8 +1487,14 @@ body[data-theme="night"] .card__cv img{filter:none}
   /* 存在 Supabase Storage 的報告，要先跟後端換一個 1 小時的簽名網址 */
   function openNote(slug) {
     S.noteUrl(slug).then(function (u) {
-      if (u) location.href = u;
-      else toast('這篇還沒有可以開的檔案。');
+      if (!u) { toast('這篇還沒有可以開的檔案。'); return; }
+      if (u.indexOf('html:') === 0) {
+        /* 雲端筆記：把報告整份寫進目前分頁（同一個網址、同一個登入狀態） */
+        var html = u.slice(5);
+        document.open(); document.write(html); document.close();
+        return;
+      }
+      location.href = u;
     });
   }
 

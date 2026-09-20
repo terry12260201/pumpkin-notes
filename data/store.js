@@ -553,8 +553,9 @@ window.PN = window.PN || {};
             if (!r.ok) throw new Error('HTTP ' + r.status);
             return r.arrayBuffer();
           }).then(function (buf) {
-            var html = new TextDecoder('utf-8').decode(buf);
-            return URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+            /* 回傳整份 HTML 文字（前面加記號），由首頁原地寫進目前這個分頁顯示。
+               不用 blob: 網址，是因為 blob 頁面的登入狀態與收藏功能在部分瀏覽器會失效。 */
+            return 'html:' + new TextDecoder('utf-8').decode(buf);
           });
         }, function (e) { warn('拿不到報告網址', e); return ''; })
         .catch(function (e) { warn('抓不到報告檔', e); return ''; });

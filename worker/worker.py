@@ -245,7 +245,7 @@ def cover_bytes(meta, work):
     b = io.BytesIO(); im.save(b, "JPEG", quality=82); return b.getvalue()
 
 
-SITE = RAW.get("site_url") or "https://pn.pumpkinvr.com/"
+SITE = RAW.get("site_url") or "https://terry12260201.github.io/pumpkin-notes/"
 def reskin_v03(html, slug_db, data, meta, shelf):
     """套上 V03 墨金樣式（工具列、點格、回書架），連結一律指向正式網址；失敗就退回原樣。"""
     try:

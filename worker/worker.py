@@ -24,6 +24,7 @@ _opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=_SSL))
 urllib.request.install_opener(_opener)
 from datetime import date
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # 讓 worker 找得到 drive_store
 
 SKILL = Path.home() / ".claude/skills/pumpkin-digital-notes/scripts"
 sys.path.insert(0, str(SKILL))
@@ -267,6 +268,48 @@ def reskin_v03(html, slug_db, data, meta, shelf):
         log("⚠️ 套 V03 樣式失敗，先用原樣上架：", e)
         return html.replace('href="../index.html', 'href="' + SITE + 'index.html')
 
+
+# ─────────────────────────── 圖片存放（不留在本機） ───────────────────────────
+IMG_MAX_W = 1280      # 截圖統一最寬 1280px：1080p 影片縮一點點，文字仍清楚，一張約 80～120 KB
+IMG_QUALITY = 80
+def shrink_jpeg(raw: bytes) -> bytes:
+    """任何格式 → 最寬 1280 的 JPEG（品質 80）。"""
+    from PIL import Image
+    import io
+    im = Image.open(io.BytesIO(raw)); im = im.convert("RGB")
+    if im.width > IMG_MAX_W:
+        im = im.resize((IMG_MAX_W, round(im.height * IMG_MAX_W / im.width)), Image.LANCZOS)
+    buf = io.BytesIO(); im.save(buf, "JPEG", quality=IMG_QUALITY, optimize=True, progressive=True); return buf.getvalue()
+
+def externalize_images(html: str, uid: str, slug_db: str):
+    """把報告裡 base64 內嵌的截圖抽出來：縮圖 → 上傳公開桶 img/<uid>/<slug>/NN.jpg → 網頁改用網址。
+    回傳 (新 html, [(檔名, bytes), …])，後者拿去 Google 雲端歸檔。"""
+    import base64 as _b
+    images = []
+    def rep(m):
+        data = shrink_jpeg(_b.b64decode(m.group(2)))
+        name = f"{len(images)+1:02d}.jpg"; images.append((name, data))
+        path = f"{uid}/{slug_db}/{name}"
+        upload("img", path, data, "image/jpeg")
+        return f'src="{SB_URL}/storage/v1/object/public/img/{path}" loading="lazy" decoding="async"'
+    out = re.sub(r'src="data:image/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)"', rep, html)
+    return out.replace(' loading="lazy" loading="lazy"', ' loading="lazy"'), images
+
+def cloud_archive(slug_db, title, html: str, cover: bytes, images, work_dir):
+    """Google 雲端歸檔（有授權才做）＋ 清掉本機工作夾（不留圖在 Mac）。"""
+    try:
+        import drive_store
+        if drive_store.enabled():
+            drive_store.archive_note(date.today().isoformat(), title, html.encode("utf-8"), cover, images, log=log)
+        else:
+            log("ℹ️ Google 雲端還沒授權（python3 worker/drive_store.py auth），這次先只存 Supabase")
+    except Exception as e:
+        log("⚠️ Google 雲端歸檔失敗（不影響上架）：", e)
+    try:
+        import shutil; shutil.rmtree(work_dir, ignore_errors=True); log("🧹 本機工作夾已清掉")
+    except Exception as e:
+        log("清工作夾失敗：", e)
+
 # ─────────────────────────── 主流程 ───────────────────────────
 def process(job):
     jid, uid = job["id"], job["owner_id"]
@@ -283,10 +326,11 @@ def process(job):
     patch_job(jid, status="publishing", progress_msg="正在上架")
     slug_db = f"{date.today().isoformat()}_{jid[:8]}"          # Storage 的路徑只能 ASCII，中文標題放 notes.title
     html = reskin_v03(html_path.read_text(encoding="utf-8"), slug_db, data, meta, shelf)
+    html, images = externalize_images(html, uid, slug_db)           # 截圖抽出去：網頁瘦身、圖存雲端
     html_p = f"{uid}/{slug_db}.html"; upload("notes", html_p, html.encode("utf-8"), "text/html; charset=utf-8")
     cover_p = ""
     cb = cover_bytes(meta, Path(meta["_work"]))
-    if cb: cover_p = f"{uid}/{slug_db}.jpg"; upload("covers", cover_p, cb, "image/jpeg")
+    if cb: cb = shrink_jpeg(cb); cover_p = f"{uid}/{slug_db}.jpg"; upload("covers", cover_p, cb, "image/jpeg")
     rm = re.search(r'name="pn:read-min" content="(\d+)"', html)
     tags = [f"主題/{t}" for t in data["tags"].get("topic", [])[:3]] + [f"用途/{data['tags'].get('use','')}"]
     row = {"slug": slug_db, "owner_id": uid, "title": data["h1"], "speaker": meta.get("uploader", ""),
@@ -303,6 +347,7 @@ def process(job):
     note_id = ins[0]["id"]
     patch_job(jid, status="done", note_id=note_id, progress_msg="已上架，看筆記 →")
     log(f"✅ 上架完成 {slug_db}")
+    cloud_archive(slug_db, data["h1"], html, cb, images, Path(meta["_work"]))
 
 def main():
     once = "--once" in sys.argv

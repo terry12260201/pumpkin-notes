@@ -452,7 +452,7 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
 <div class="pn-progress" aria-hidden="true"><i id="pn-bar"></i></div>
 
 <div class="pn-tools" role="toolbar" aria-label="這篇筆記的工具">
-  <a class="pn-tools__back" href="%%HOME%%#library"><svg><use href="#i-left"/></svg><span>回書架</span></a>
+  <a class="pn-tools__back" href="%%HOME%%#library" onclick="if(this.href.split('#')[0]===location.href.split('#')[0]){location.hash='library';location.reload();return false}"><svg><use href="#i-left"/></svg><span>回書架</span></a>
   <span class="pn-tools__t">%%STRONG%%</span>
   <div class="pn-tools__r">
     <button class="pn-tbtn" data-act="fav" aria-pressed="false" title="加入我的最愛"><svg><use href="#i-heart"/></svg><span class="pn-tbtn__l">收藏</span></button>

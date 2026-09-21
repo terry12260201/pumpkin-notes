@@ -912,9 +912,9 @@ body[data-theme="night"] .card__cv img{filter:none}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data/config.js?v=20260920d"></script>
-<script src="data/reports.js?v=20260920d"></script>
-<script src="data/store.js?v=20260920d"></script>
+<script src="data/config.js?v=20260921a"></script>
+<script src="data/reports.js?v=20260921a"></script>
+<script src="data/store.js?v=20260921a"></script>
 <script>
 /* ── 小南瓜數位筆記 V03：首頁殼 ──────────────────────────────
    路由：#library / #team / #inbox / #me（＋未登入時的 #login）
@@ -1474,8 +1474,9 @@ body[data-theme="night"] .card__cv img{filter:none}
       var m = document.createElement('div');
       m.className = 'app-menu'; m.id = 'me-menu';
       m.innerHTML = '<div class="app-menu__h"><b>' + esc(me.name) + '</b><span>' + esc(me.department) + '／' + esc(me.title) + '</span></div>' +
-        '<a href="#me">我的筆記</a><a href="#me">我的最愛</a><button id="m-out">' + (auth.live() ? '登出' : '登出（示範）') + '</button>';
+        '<a href="#me" data-metab="mine">我的筆記</a><a href="#me" data-metab="fav">我的最愛</a><a href="#me" data-metab="set">設定（名稱／書架）</a><button id="m-out">' + (auth.live() ? '登出' : '登出（示範）') + '</button>';
       w.appendChild(m);
+      $$('#me-menu [data-metab]').forEach(function (a) { a.onclick = function () { st.me = a.dataset.metab; m.remove(); if (st.route === 'me') renderMe(); }; });
       $('#m-out').onclick = function () {
         m.remove();
         if (auth.live()) { PN.auth.signOut().then(function () { renderNav(); location.hash = 'library'; route(); toast('已登出'); }); }
@@ -1491,6 +1492,9 @@ body[data-theme="night"] .card__cv img{filter:none}
       if (u.indexOf('html:') === 0) {
         /* 雲端筆記：把報告整份寫進目前分頁（同一個網址、同一個登入狀態） */
         var html = u.slice(5);
+        /* 回書架：報告寫在同一個網址上，只差 #library 時瀏覽器不會重新載入 → 強制 reload */
+        html = html.replace(/<a class="pn-tools__back" href="([^"]*)"(?![^>]*onclick)/,
+          '<a class="pn-tools__back" href="$1" onclick="location.hash=\'library\';location.reload();return false"');
         document.open(); document.write(html); document.close();
         return;
       }

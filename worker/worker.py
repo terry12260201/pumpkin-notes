@@ -84,6 +84,12 @@ def queued_jobs():
 def patch_job(jid, **fields):
     sb("PATCH", f"/rest/v1/jobs?id=eq.{jid}", fields, {"Prefer": "return=minimal"})
 
+def claim_job(jid, **fields):
+    """原子接單：只有這張還在 queued 才改得動；回傳 True＝接到、False＝已被別台接走或做掉。
+    （兩台整理主機同時在跑時，避免同一張單做兩次、上架時撞 slug。）"""
+    rows = sb("PATCH", f"/rest/v1/jobs?id=eq.{jid}&status=eq.queued", fields, {"Prefer": "return=representation"})
+    return bool(rows)
+
 def profile_email(uid):
     rows = sb("GET", f"/rest/v1/profiles?id=eq.{uid}&select=email,display_name")
     return rows[0] if rows else {}
@@ -334,8 +340,9 @@ def cloud_archive(slug_db, title, html: str, cover: bytes, images, work_dir):
 # ─────────────────────────── 主流程 ───────────────────────────
 def process(job):
     jid, uid = job["id"], job["owner_id"]
+    if not claim_job(jid, status="prepping", claimed_by=WORKER, progress_msg="正在下載影片與字幕，並抽出畫面"):
+        log(f"⏭ 跳過 {jid[:8]}：已被別台整理主機接走或做完"); return False
     log(f"▶ 接單 {jid[:8]}  {job.get('source_url') or job.get('upload_path')}")
-    patch_job(jid, status="prepping", claimed_by=WORKER, progress_msg="正在下載影片與字幕，並抽出畫面")
     meta = prep(job)
     patch_job(jid, status="writing", progress_msg=f"正在挑 12～16 張關鍵畫面、用 {MODEL} 寫白話筆記（約 3～6 分鐘）")
     data = write_with_claude(meta)
@@ -392,9 +399,9 @@ def drain():
             log("讀排隊單失敗：", e); return n
         if not jobs: return n
         for job in jobs:
-            n += 1
             try:
-                process(job)
+                if process(job) is False: continue
+                n += 1
             except Exception as e:
                 log("❌ 失敗：", e)
                 src = job.get("source_url") or job.get("upload_path") or ""

@@ -1,4 +1,4 @@
-# 🎃 南瓜數位筆記（Pumpkin Notes）｜把影片，變成團隊用得上的筆記。
+# 🎃 Pumpkin Notes｜把影片，變成團隊用得上的筆記。
 
 正式網站：https://notes.pumpkinvrarai.com/
 

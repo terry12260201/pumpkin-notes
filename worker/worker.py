@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""南瓜數位筆記（Pumpkin Notes）整理主機（worker）
+"""Pumpkin Notes 整理主機（worker）
 把網站 https://notes.pumpkinvrarai.com/ 收件匣排隊的影片，跑完「下載→抽幀→Claude 寫報告→驗收→上架」全流程。
 
 用法：
@@ -44,7 +44,7 @@ ANTHROPIC_KEY = RAW.get("anthropic_api_key") or os.environ.get("ANTHROPIC_API_KE
 MODEL = RAW.get("model") or "claude-opus-5"
 WORKER = RAW.get("worker_name") or socket.gethostname()
 STEP = 10
-APP = "南瓜數位筆記"
+APP = "Pumpkin Notes"
 TG_TOKEN = RAW.get("telegram_bot_token") or os.environ.get("PN_TG_TOKEN", "")
 TG_CHAT = RAW.get("telegram_chat_id") or os.environ.get("PN_TG_CHAT", "")
 POLL_FALLBACK = int(RAW.get("poll_fallback_sec") or 120)   # Realtime 正常時只是保險；Realtime 掛了自動改 30 秒
@@ -54,7 +54,7 @@ def log(*a): print(time.strftime("%H:%M:%S"), *a, flush=True)
 
 def notify(text, silent=False):
     """壞了就告訴南瓜：Telegram Bot API sendMessage（只發不收，可與其他機器人共用 token）。沒設定就只寫 log。"""
-    line = f"🎃 {APP}整理主機（{WORKER}）\n{text}"
+    line = f"🎃 {APP} 整理主機（{WORKER}）\n{text}"
     if not (TG_TOKEN and TG_CHAT):
         log("（未設 Telegram，僅記錄）", text.replace("\n", " ")); return
     try:
@@ -444,7 +444,7 @@ def main():
     once = "--once" in sys.argv
     if not SB_KEY: sys.exit("缺 supabase_service_key：先跑 worker_setup.command")
     if not ANTHROPIC_KEY and not os.environ.get("ANTHROPIC_API_KEY"): log("⚠️ 沒設 anthropic_api_key，會用 SDK 的預設登入（ant auth）")
-    log(f"{APP}整理主機上線：{WORKER}，模型 {MODEL}，{'只跑一輪' if once else 'Realtime 即時接單'}")
+    log(f"{APP} 整理主機上線：{WORKER}，模型 {MODEL}，{'只跑一輪' if once else 'Realtime 即時接單'}")
     if once:
         drain(); return
     try:

@@ -1,0 +1,64 @@
+# 可行性實測：GitHub Actions 的雲端 IP 抓 YouTube 會不會被擋
+# 不用任何 Secret、不印任何金鑰。手動觸發：gh workflow run yt-probe.yml
+name: yt-probe
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: "要測的 YouTube 連結"
+        default: "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+        required: true
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 裝 ffmpeg 與 yt-dlp
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install -q -U yt-dlp
+          yt-dlp --version; ffmpeg -version | head -1
+          curl -s https://api.ipify.org && echo "  ← 這台 runner 的對外 IP"
+      - name: 1 metadata
+        id: meta
+        continue-on-error: true
+        run: yt-dlp --skip-download --print "%(title)s|||%(uploader)s|||%(duration)s" "${{ inputs.video_url }}"
+      - name: 2 字幕
+        id: subs
+        continue-on-error: true
+        run: |
+          yt-dlp --skip-download --write-subs --write-auto-subs --sub-lang "zh-TW,zh-Hant,zh,en" --sub-format "vtt" -o "probe.%(ext)s" "${{ inputs.video_url }}"
+          ls -la probe*.vtt
+      - name: 3 影片本體（480p，失敗再試 android client）
+        id: video
+        continue-on-error: true
+        run: |
+          yt-dlp -f "18/b[height<=480]" -o probe.mp4 "${{ inputs.video_url }}" \
+          || { echo "::warning::預設 client 失敗，改試 android"; yt-dlp --extractor-args "youtube:player_client=android" -f "18/b[height<=480]" -o probe.mp4 "${{ inputs.video_url }}"; }
+          ls -la probe.mp4
+      - name: 4 ffmpeg 抽幀
+        id: frames
+        continue-on-error: true
+        run: |
+          ffmpeg -loglevel error -i probe.mp4 -vf "fps=1/30,scale=640:-2" -frames:v 3 f_%02d.jpg
+          ls -la f_*.jpg
+      - name: 總表
+        run: |
+          r(){ [ "$1" = success ] && echo "✅" || echo "❌ ($1)"; }
+          {
+            echo "## yt-probe 結果"
+            echo "| 項目 | 結果 |"; echo "|---|---|"
+            echo "| 1 metadata | $(r '${{ steps.meta.outcome }}') |"
+            echo "| 2 字幕 | $(r '${{ steps.subs.outcome }}') |"
+            echo "| 3 影片本體 | $(r '${{ steps.video.outcome }}') |"
+            echo "| 4 抽幀 | $(r '${{ steps.frames.outcome }}') |"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: 上傳字幕與幀
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-output
+          path: |
+            probe*.vtt
+            f_*.jpg
+          if-no-files-found: ignore

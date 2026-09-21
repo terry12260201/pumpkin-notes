@@ -59,3 +59,8 @@
 3. **24 小時整理主機**：現況 jobs 是排隊制，電腦沒開只是延後不會掉單。路線：短期 Mac → 中期搬 PC-01（launchd／工作排程器常駐）→ 長期租小主機（Hetzner／Oracle 免費層）。GitHub Actions 排程可行但 YouTube 常擋雲端 IP，需 cookies，不建議當主力。
 4. Obsidian 回寫（§6 第 5 點）。
 5. ✅ 2026-09-20 已合併：墨金 1.2 合併版（公開庫 7ac2da4）；點格預設＝Pumpkin Notes 發亮版、磁吸改選用；四處已同步。原記錄：墨金 skill 有兩份 v1.2 要合併：GPT/Codex 在 `~/GitHub/pumpkin-ink-gold` 工作區寫的（未 commit，`references/ink-gold-ui.js` 磁吸點陣＋Phosphor 圖示＋Logo）與 Fable 在 `~/.claude/skills/pumpkin-ink-gold/references/互動點格與品牌.md` 寫的（Pumpkin Notes 定案參數）。合併後再同步 OB／私有 pumpkin-skills／公開庫。
+
+## 8. 2026-09-21 整理主機去常駐化：GitHub Actions 實測結果
+南瓜要求「按分析就自動跑，不用一台電腦常駐輪詢」。目標架構＝Supabase Database Webhook → GitHub `repository_dispatch` → Actions 跑 `worker.py --once`（已有此旗標；`PN_CONFIG` 可指定設定檔）。
+**實測（`.github/workflows/yt-probe.yml`，手動觸發，無 Secret）**：兩次、兩個不同 Azure IP（20.109.38.224／40.76.127.64），yt-dlp 連 metadata 都拿不到，一律 `Sign in to confirm you're not a bot`，android client 備援也一樣。結論：**GitHub Actions 裸跑 yt-dlp 對 YouTube 全擋**。錄影檔上傳的單不受影響。
+待南瓜決定下一步（三選一）：(a) Actions＋YouTube cookies 存 Secrets（會過期，要定期換）；(b) Actions＋住宅代理（月費）；(c) YouTube 單留家裡主機、錄影檔單走 Actions。

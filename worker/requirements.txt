@@ -1,0 +1,6 @@
+# 南瓜數位筆記整理主機的 Python 相依（pip install -r requirements.txt）
+anthropic>=0.60
+pillow>=10
+realtime>=2.0
+certifi
+yt-dlp

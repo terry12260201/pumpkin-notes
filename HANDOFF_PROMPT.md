@@ -63,4 +63,7 @@
 ## 8. 2026-09-21 整理主機去常駐化：GitHub Actions 實測結果
 南瓜要求「按分析就自動跑，不用一台電腦常駐輪詢」。目標架構＝Supabase Database Webhook → GitHub `repository_dispatch` → Actions 跑 `worker.py --once`（已有此旗標；`PN_CONFIG` 可指定設定檔）。
 **實測（`.github/workflows/yt-probe.yml`，手動觸發，無 Secret）**：兩次、兩個不同 Azure IP（20.109.38.224／40.76.127.64），yt-dlp 連 metadata 都拿不到，一律 `Sign in to confirm you're not a bot`，android client 備援也一樣。結論：**GitHub Actions 裸跑 yt-dlp 對 YouTube 全擋**。錄影檔上傳的單不受影響。
-待南瓜決定下一步（三選一）：(a) Actions＋YouTube cookies 存 Secrets（會過期，要定期換）；(b) Actions＋住宅代理（月費）；(c) YouTube 單留家裡主機、錄影檔單走 Actions。
+南瓜決定：**worker 搬 PC-01（已為 Telegram 機器人 24 小時開著）＋ 改 Supabase Realtime 即時觸發**。
+**已做（2026-09-21）**：`worker.py` 改為 Realtime 訂閱 `jobs` 表（Mac 實測送單→接單 0 秒），斷線退回 30 秒輪詢並自動重連；Telegram 回報（失敗單／Realtime 斷／當機／上線，設定 `telegram_bot_token`+`telegram_chat_id`，只 sendMessage）；啟動時重排中途掛掉的單；`skill_dir`／`PN_CONFIG`／`PN_SKILL_DIR` 可指定路徑。PC-01 安裝包：`worker/PC01_接手.md`（給 PC-01 的 AI 讀）、`worker/pc01/啟動整理主機.bat`（看門狗）、`worker/pc01/加設定.py`、`worker/requirements.txt`。
+**產品中文名定案：「南瓜數位筆記」**（英文 Pumpkin Notes），一句話：把影片，變成團隊用得上的筆記。
+**待南瓜做**：把 config.json 帶去 PC-01、照 PC01_接手.md 裝好、通知後停 Mac 的 worker。Mac 目前仍跑著新版 worker 頂著。

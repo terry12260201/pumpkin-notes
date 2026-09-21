@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Pumpkin Notes 整理主機（worker）
-把網站收件匣排隊的影片，跑完「下載→抽幀→Claude 寫報告→驗收→上架」全流程。
+"""南瓜數位筆記（Pumpkin Notes）整理主機（worker）
+把網站 https://notes.pumpkinvrarai.com/ 收件匣排隊的影片，跑完「下載→抽幀→Claude 寫報告→驗收→上架」全流程。
 
 用法：
   python3 worker.py --once     # 處理完目前排隊的就結束
-  python3 worker.py            # 常駐，每 30 秒看一次
+  python3 worker.py            # 常駐：訂閱 Supabase Realtime，有人送單「立刻」開跑；
+                               #       另外每 POLL_FALLBACK 秒補看一次（Realtime 斷線時的保險）
 
 需要 ~/.config/pumpkin-notes/config.json 有：
   "supabase_url": "https://xxxx.supabase.co",
   "supabase_service_key": "sb_secret_...",   # Supabase → Settings → API Keys → Secret keys
   "anthropic_api_key": "sk-ant-...",         # 或用環境變數 ANTHROPIC_API_KEY
+  "telegram_bot_token": "...",  "telegram_chat_id": "..."   # 選填：壞了會發 Telegram 告訴南瓜（只 sendMessage，不 poll）
+  "worker_name": "PC-01"                                    # 選填：顯示在網站「claimed_by」與通知
 第一次請跑 worker_setup.command 貼金鑰。
 """
 import base64, io, json, os, re, subprocess, sys, time, socket, urllib.request, urllib.parse, urllib.error
@@ -26,22 +29,40 @@ from datetime import date
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))   # 讓 worker 找得到 drive_store
 
-SKILL = Path.home() / ".claude/skills/pumpkin-digital-notes/scripts"
+CONF = Path(os.path.expanduser(os.environ.get("PN_CONFIG") or "~/.config/pumpkin-notes/config.json"))
+RAW = json.loads(CONF.read_text(encoding="utf-8")) if CONF.exists() else {}
+SKILL = Path(os.path.expanduser(os.environ.get("PN_SKILL_DIR") or RAW.get("skill_dir") or "~/.claude/skills/pumpkin-digital-notes/scripts"))
+if not (SKILL / "prep_youtube.py").exists(): sys.exit(f"找不到 skill 腳本：{SKILL}（config.json 加 skill_dir 或設環境變數 PN_SKILL_DIR）")
 sys.path.insert(0, str(SKILL))
 from pn_config import cfg            # noqa: E402
 from report_lib import Report        # noqa: E402
 from PIL import Image                # noqa: E402
 
-CONF = Path.home() / ".config/pumpkin-notes/config.json"
-RAW = json.loads(CONF.read_text(encoding="utf-8")) if CONF.exists() else {}
 SB_URL = RAW.get("supabase_url") or "https://xoyalmkdaiehsldbokud.supabase.co"
 SB_KEY = RAW.get("supabase_service_key") or os.environ.get("SUPABASE_SERVICE_KEY", "")
 ANTHROPIC_KEY = RAW.get("anthropic_api_key") or os.environ.get("ANTHROPIC_API_KEY", "")
 MODEL = RAW.get("model") or "claude-opus-5"
 WORKER = RAW.get("worker_name") or socket.gethostname()
 STEP = 10
+APP = "南瓜數位筆記"
+TG_TOKEN = RAW.get("telegram_bot_token") or os.environ.get("PN_TG_TOKEN", "")
+TG_CHAT = RAW.get("telegram_chat_id") or os.environ.get("PN_TG_CHAT", "")
+POLL_FALLBACK = int(RAW.get("poll_fallback_sec") or 120)   # Realtime 正常時只是保險；Realtime 掛了自動改 30 秒
+SITE = "https://notes.pumpkinvrarai.com/"
 
 def log(*a): print(time.strftime("%H:%M:%S"), *a, flush=True)
+
+def notify(text, silent=False):
+    """壞了就告訴南瓜：Telegram Bot API sendMessage（只發不收，可與其他機器人共用 token）。沒設定就只寫 log。"""
+    line = f"🎃 {APP}整理主機（{WORKER}）\n{text}"
+    if not (TG_TOKEN and TG_CHAT):
+        log("（未設 Telegram，僅記錄）", text.replace("\n", " ")); return
+    try:
+        body = urllib.parse.urlencode({"chat_id": TG_CHAT, "text": line, "disable_notification": "true" if silent else "false"}).encode()
+        req = urllib.request.Request(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", data=body, method="POST")
+        with urllib.request.urlopen(req, timeout=20) as r: r.read()
+    except Exception as e:
+        log("⚠️ Telegram 通知失敗：", e)
 
 # ─────────────────────────── Supabase REST ───────────────────────────
 def sb(method, path, body=None, headers=None, raw=False):
@@ -349,25 +370,101 @@ def process(job):
     log(f"✅ 上架完成 {slug_db}")
     cloud_archive(slug_db, data["h1"], html, cb, images, Path(meta["_work"]))
 
-def main():
-    once = "--once" in sys.argv
-    if not SB_KEY: sys.exit("缺 supabase_service_key：先跑 worker_setup.command")
-    if not ANTHROPIC_KEY and not os.environ.get("ANTHROPIC_API_KEY"): log("⚠️ 沒設 anthropic_api_key，會用 SDK 的預設登入（ant auth）")
-    log(f"整理主機上線：{WORKER}，模型 {MODEL}，{'只跑一輪' if once else '每 30 秒看一次'}")
+def recover_stale():
+    """整理主機上次中途掛掉，留在 prepping/writing/... 的單：重排一次；已重排過還掛 → 標失敗並通知。"""
+    st = "status=in.(prepping,writing,checking,publishing)"
+    for j in sb("GET", f"/rest/v1/jobs?{st}&claimed_by=eq.{urllib.parse.quote(WORKER)}&select=id,source_url,upload_path,progress_msg"):
+        src = j.get("source_url") or j.get("upload_path") or ""
+        if (j.get("progress_msg") or "").startswith("整理主機重啟"):
+            patch_job(j["id"], status="failed", progress_msg="失敗：整理主機兩次中途停止，請再送一次或找南瓜")
+            notify(f"❌ 一張單重試後仍卡住，已標失敗\n{src}\n單號 {j['id'][:8]}")
+        else:
+            patch_job(j["id"], status="queued", claimed_by=None, progress_msg="整理主機重啟，重新排隊")
+            log("♻️ 重排中途單", j["id"][:8])
+
+def drain():
+    """把目前排隊的單全部做完。回傳做了幾張。"""
+    n = 0
     while True:
         try:
             jobs = queued_jobs()
         except Exception as e:
-            log("讀排隊單失敗：", e); jobs = []
+            log("讀排隊單失敗：", e); return n
+        if not jobs: return n
         for job in jobs:
+            n += 1
             try:
                 process(job)
             except Exception as e:
                 log("❌ 失敗：", e)
+                src = job.get("source_url") or job.get("upload_path") or ""
                 try: patch_job(job["id"], status="failed", progress_msg=("失敗：" + str(e))[:300])
                 except Exception as e2: log("回寫失敗：", e2)
-        if once: break
-        time.sleep(30)
+                notify(f"❌ 一張單做失敗\n{src}\n原因：{str(e)[:200]}\n單號 {job['id'][:8]}（夥伴可在收件匣重送）")
+
+def realtime_thread(wake, state):
+    """背景執行緒：訂閱 jobs 表變動，有動靜就叫醒主迴圈。斷線自動重連；連不上就把 state['ok'] 設 False（主迴圈改密集輪詢）。"""
+    import asyncio, threading
+    try:
+        import certifi; os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+        from realtime import AsyncRealtimeClient
+    except ImportError:
+        log("⚠️ 沒裝 realtime 套件（pip install realtime certifi），改用每 30 秒輪詢"); state["ok"] = False; return
+    async def run():
+        fails = 0
+        while True:
+            client = AsyncRealtimeClient(SB_URL.replace("https://", "wss://") + "/realtime/v1", SB_KEY, auto_reconnect=True, max_retries=10)
+            try:
+                await client.connect()
+                ch = client.channel("pn-worker-" + WORKER)
+                ch.on_postgres_changes("*", schema="public", table="jobs", callback=lambda p: wake.set())
+                st = {}
+                await ch.subscribe(lambda status, err=None: st.update(s=str(status), e=err))
+                for _ in range(50):
+                    if st.get("s", "").endswith("SUBSCRIBED"): break
+                    await asyncio.sleep(0.2)
+                if not st.get("s", "").endswith("SUBSCRIBED"): raise RuntimeError(f"訂閱失敗：{st}")
+                if not state["ok"] and fails: notify("✅ Realtime 已重新連上，恢復即時接單", silent=True)
+                state["ok"] = True; fails = 0; log("📡 Realtime 已訂閱 jobs 表（有人送單立刻開跑）")
+                while client.is_connected: await asyncio.sleep(5)
+                raise RuntimeError("連線中斷")
+            except Exception as e:
+                fails += 1
+                if state["ok"] or fails == 3:
+                    log("⚠️ Realtime 斷線：", e, "→ 先用 30 秒輪詢，背景持續重連")
+                    if fails == 3: notify(f"⚠️ Realtime 連不上（{e}），已改每 30 秒輪詢，不會漏單但會慢一點", silent=True)
+                state["ok"] = False
+                try: await client.close()
+                except Exception: pass
+                await asyncio.sleep(min(60, 5 * fails))
+    threading.Thread(target=lambda: asyncio.run(run()), daemon=True, name="realtime").start()
+
+def main():
+    import threading
+    once = "--once" in sys.argv
+    if not SB_KEY: sys.exit("缺 supabase_service_key：先跑 worker_setup.command")
+    if not ANTHROPIC_KEY and not os.environ.get("ANTHROPIC_API_KEY"): log("⚠️ 沒設 anthropic_api_key，會用 SDK 的預設登入（ant auth）")
+    log(f"{APP}整理主機上線：{WORKER}，模型 {MODEL}，{'只跑一輪' if once else 'Realtime 即時接單'}")
+    if once:
+        drain(); return
+    try:
+        recover_stale()
+    except Exception as e:
+        log("查中途單失敗：", e)
+    wake = threading.Event(); state = {"ok": False}
+    realtime_thread(wake, state)
+    notify(f"🟢 上線，等單中。網站 {SITE}", silent=True)
+    try:
+        while True:
+            wake.clear()
+            n = drain()
+            if n: log(f"這輪做了 {n} 張，回到等單")
+            wake.wait(timeout=POLL_FALLBACK if state["ok"] else 30)
+    except KeyboardInterrupt:
+        log("手動停止"); notify("⏹ 手動停止", silent=True)
+    except Exception as e:
+        log("💥 整理主機當掉：", e); notify(f"💥 整理主機當掉：{str(e)[:300]}\n（啟動腳本會自動重開；連續失敗請看 PC-01 的 worker.log）")
+        raise
 
 if __name__ == "__main__":
     main()

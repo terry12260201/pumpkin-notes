@@ -23,7 +23,7 @@ window.PN = window.PN || {};
   var sb = null;
   PN.mode = hasKey ? 'supabase' : 'demo';
 
-  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe', trash: 'pnTrash', cover: 'pnCover', shelfNames: 'pnShelfNames', tagRename: 'pnTagRename' };
+  var K = { theme: 'pnTheme', fav: 'pnFav', read: 'pnRead', share: 'pnShare', jobs: 'pnJobs', me: 'pnMe', trash: 'pnTrash', cover: 'pnCover', shelfNames: 'pnShelfNames', tagRename: 'pnTagRename', shelfAdd: 'pnShelfAdd', shelfDel: 'pnShelfDel', shelfMove: 'pnShelfMove' };
   function rd(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
   function wr(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
   function D() { return window.PN_DATA || { reports: [], bySlug: {}, shelves: [], tagFamilies: [], profiles: [] }; }
@@ -137,9 +137,12 @@ window.PN = window.PN || {};
     if (PN.mode === 'demo') {                 /* 示範模式：垃圾桶與自訂封面都在這台瀏覽器 */
       var tr = rd(K.trash, {}), cv = rd(K.cover, {});
       C.notes.forEach(function (c) { if (tr[c.slug]) { c.deletedAt = tr[c.slug].at; c.deletedBy = tr[c.slug].by; } if (cv[c.slug]) c.cover = cv[c.slug]; });
-      var sn = rd(K.shelfNames, {}), tm = rd(K.tagRename, {});
+      var sn = rd(K.shelfNames, {}), tm = rd(K.tagRename, {}), sd = rd(K.shelfDel, []), sm = rd(K.shelfMove, {});
+      rd(K.shelfAdd, []).forEach(function (a) { C.shelves.push({ id: a.id, name: a.name, emoji: '', description: '', sort: 900, sections: [] }); });
+      C.shelves = C.shelves.filter(function (s) { return sd.indexOf(s.id) < 0; });
       C.shelves.forEach(function (s) { if (sn[s.id]) s.name = sn[s.id]; });
       C.notes.forEach(function (c) {
+        if (sm[c.slug]) { c.shelf = sm[c.slug]; c.shelfName = shelfMeta(c.shelf).name; }
         if (sn[c.shelf]) c.shelfName = sn[c.shelf];
         c.tags = (c.tags || []).map(function (t) { return tm[t] || t; });
       });
@@ -337,6 +340,33 @@ window.PN = window.PN || {};
       return Promise.resolve(sb.from('shelves').update({ name: name }).eq('id', id))
         .then(function (x) { if (x && x.error) { warn('書架改名失敗：' + x.error.message); return false; } return true; },
           function (e) { warn('書架改名失敗', e); return false; });
+    },
+    /* 換書架：筆記擁有者才能改；改完存 notes.shelf，夥伴重新打開就看到 */
+    setShelf: function (slug, id) {
+      var r = C.bySlug[slug] || (D().bySlug || {})[slug]; if (!r) return Promise.resolve(false);
+      r.shelf = id; r.shelfName = shelfMeta(id).name;
+      if (!live()) { var sm = rd(K.shelfMove, {}); sm[slug] = id; wr(K.shelfMove, sm); return Promise.resolve(true); }
+      return Promise.resolve(sb.from('notes').update({ shelf: id }).eq('slug', slug))
+        .then(function (x) { if (x && x.error) { warn('換書架失敗：' + x.error.message); return false; } return true; },
+          function (e) { warn('換書架失敗', e); return false; });
+    },
+    shelfCount: function (id) { return C.notes.filter(function (r) { return r.shelf === id; }).length; },
+    addShelf: function (name) {
+      name = (name || '').trim(); if (!name) return Promise.resolve(false);
+      var id = 's' + Date.now().toString(36), row = { id: id, name: name, emoji: '', description: '', sort: 100 + C.shelves.length };
+      C.shelves.push(Object.assign({ sections: [], n: 0 }, row));
+      if (!live()) { var a = rd(K.shelfAdd, []); a.push({ id: id, name: name }); wr(K.shelfAdd, a); return Promise.resolve(true); }
+      return Promise.resolve(sb.from('shelves').insert(row))
+        .then(function (x) { if (x && x.error) { warn('新增書架失敗：' + x.error.message); return false; } return true; },
+          function (e) { warn('新增書架失敗', e); return false; });
+    },
+    deleteShelf: function (id) {
+      if (this.shelfCount(id)) return Promise.resolve(false);           /* 還有筆記在裡面就不能刪 */
+      C.shelves = C.shelves.filter(function (s) { return s.id !== id; });
+      if (!live()) { var d = rd(K.shelfDel, []); if (d.indexOf(id) < 0) d.push(id); wr(K.shelfDel, d); return Promise.resolve(true); }
+      return Promise.resolve(sb.from('shelves').delete().eq('id', id))
+        .then(function (x) { if (x && x.error) { warn('刪書架失敗：' + x.error.message); return false; } return true; },
+          function (e) { warn('刪書架失敗', e); return false; });
     },
     renameTag: function (family, oldV, newV) {
       var from = family + '/' + oldV, to = family + '/' + newV;
@@ -562,6 +592,40 @@ window.PN = window.PN || {};
     }
   };
   PN.store = store;
+
+  /* ── 報告頁專用：左上角書架標籤顯示真名；擁有者點一下可換書架（存 Supabase，夥伴重開就看到） ── */
+  (function () {
+    var mt = document.querySelector('meta[name="pn:slug"]'), k = document.querySelector('.ig-kicker');
+    if (!mt || !k) return;
+    var slug = mt.content;
+    store.ready().then(function () {
+      var r = store.get(slug); if (!r) return;
+      function nm(id) { return shelfMeta(id).name; }
+      function paint() { k.textContent = nm(r.shelf); k.setAttribute('href', k.getAttribute('href').replace(/shelf=[^&]*/, 'shelf=' + encodeURIComponent(r.shelf || ''))); }
+      paint();
+      if (!store.canShare(slug)) return;
+      var st = document.createElement('style');
+      st.textContent = '.ig-kicker.is-editable{cursor:pointer}.ig-kicker.is-editable:after{content:" ▾";opacity:.6}.ig-kicker--sel{font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:999px;padding:3px 12px;cursor:pointer}';
+      document.head.appendChild(st);
+      k.classList.add('is-editable'); k.title = '點一下換書架';
+      k.addEventListener('click', function (e) {
+        e.preventDefault();
+        var sel = document.createElement('select'); sel.className = 'ig-kicker ig-kicker--sel';
+        C.shelves.forEach(function (sh) { var o = document.createElement('option'); o.value = sh.id; o.textContent = sh.name; o.selected = sh.id === r.shelf; sel.appendChild(o); });
+        k.replaceWith(sel); sel.focus();
+        var closed = false; function back() { if (closed) return; closed = true; sel.replaceWith(k); }
+        sel.addEventListener('change', function () {
+          var id = sel.value;
+          store.setShelf(slug, id).then(function (ok) {
+            back(); paint();
+            var t = document.getElementById('pn-toast');
+            if (t) { t.textContent = ok ? '已換到「' + nm(id) + '」' : '沒存成，再試一次'; t.classList.add('on'); setTimeout(function () { t.classList.remove('on'); }, 2200); }
+          });
+        });
+        sel.addEventListener('blur', function () { setTimeout(back, 150); });
+      });
+    });
+  })();
 
   /* ── PN.auth：登入／登出 ────────────────────────────────────── */
   PN.auth = {

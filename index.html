@@ -585,7 +585,7 @@ body.ig{background-image:none;overflow-x:clip}   /* 點格改用 canvas 畫 */
 /* 書架與標籤管理 */
 .mg-h{margin-top:18px;font-size:14px;font-weight:600;color:var(--ig-ink)}
 .mg-f{margin-top:12px;font:500 12px var(--ig-font-mono);color:var(--ig-ink-muted);letter-spacing:.06em}
-.mg-row{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:8px}
+.mg-row{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto;gap:8px;align-items:center;margin-top:8px}
 .mg-row input{height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--ig-ink-hairline);background:var(--ig-card-alt);color:var(--ig-ink);font:400 14px var(--ig-font-sans);min-width:0}
 .mg-row input:focus{outline:none;box-shadow:var(--ig-focus)}
 .mg-k{font:12px var(--ig-font-mono);color:var(--ig-ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -912,9 +912,9 @@ body[data-theme="night"] .card__cv img{filter:none}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="data/config.js?v=20260921a"></script>
-<script src="data/reports.js?v=20260921a"></script>
-<script src="data/store.js?v=20260921a"></script>
+<script src="data/config.js?v=20260922a"></script>
+<script src="data/reports.js?v=20260922a"></script>
+<script src="data/store.js?v=20260922a"></script>
 <script>
 /* ── 小南瓜數位筆記 V03：首頁殼 ──────────────────────────────
    路由：#library / #team / #inbox / #me（＋未登入時的 #login）
@@ -1279,8 +1279,10 @@ body[data-theme="night"] .card__cv img{filter:none}
   /* 書架與標籤改名（只有 owner 看得到；示範模式也可試） */
   function manageHTML() {
     var sh = D.shelves.map(function (s) {
-      return '<div class="mg-row"><span class="mg-k">' + esc(s.id) + '</span><input data-shelf="' + esc(s.id) + '" value="' + esc(s.name) + '" maxlength="30"><button class="ig-btn ig-btn--sm" data-save-shelf="' + esc(s.id) + '">存</button></div>';
-    }).join('');
+      var n = S.shelfCount(s.id);
+      return '<div class="mg-row"><span class="mg-k">' + esc(s.id) + '</span><input data-shelf="' + esc(s.id) + '" value="' + esc(s.name) + '" maxlength="30"><button class="ig-btn ig-btn--sm" data-save-shelf="' + esc(s.id) + '">存</button>' +
+        '<button class="ig-btn ig-btn--sm" data-del-shelf="' + esc(s.id) + '"' + (n ? ' disabled title="還有 ' + n + ' 篇筆記在這個書架，先把它們換到別的書架"' : ' title="刪掉這個書架"') + '>刪</button></div>';
+    }).join('') + '<div class="mg-row"><span class="mg-k">新增</span><input id="mg-new-shelf" placeholder="新書架名稱" maxlength="30"><button class="ig-btn ig-btn--sm" id="mg-add-shelf">＋ 新增</button></div>';
     var vocab = S.vocab(), tg = '';
     ['主題', '用途', '關聯'].forEach(function (f) {
       var vals = vocab[f] || []; if (!vals.length) return;
@@ -1293,6 +1295,26 @@ body[data-theme="night"] .card__cv img{filter:none}
       '<h4 class="mg-h">書架名稱</h4>' + sh + '<h4 class="mg-h">篩選標籤</h4>' + tg + '</div>';
   }
   function bindManage() {
+    var addBtn = $('#mg-add-shelf');
+    if (addBtn) addBtn.onclick = function () {
+      var v = $('#mg-new-shelf').value.trim(); if (!v) { toast('先打書架名稱'); return; }
+      Promise.resolve(S.addShelf(v)).then(function (ok) {
+        if (!ok) { toast('沒存成，再試一次'); return; }
+        toast('已新增書架「' + v + '」'); renderFacets(); renderMe(); var js = $('#j-shelf'); if (js) js.innerHTML = '';
+      });
+    };
+    $$('[data-del-shelf]').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.dataset.delShelf, s = D.shelves.filter(function (x) { return x.id === id; })[0] || {};
+        confirmBox('要刪掉書架「' + (s.name || id) + '」嗎？', '裡面沒有筆記，刪了之後收件匣就選不到它。', '刪掉').then(function (yes) {
+          if (!yes) return;
+          Promise.resolve(S.deleteShelf(id)).then(function (ok) {
+            if (!ok) { toast('沒刪成，再試一次'); return; }
+            toast('書架已刪除'); renderFacets(); renderMe(); var js = $('#j-shelf'); if (js) js.innerHTML = '';
+          });
+        });
+      };
+    });
     $$('[data-save-shelf]').forEach(function (b) {
       b.onclick = function () {
         var id = b.dataset.saveShelf, v = $('[data-shelf="' + id + '"]').value.trim();

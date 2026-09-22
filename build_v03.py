@@ -530,9 +530,9 @@ REPORT_TEMPLATE = r"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="u
 </div>
 <div class="toast" id="pn-toast" role="status" aria-live="polite"></div>
 
-<script src="%%UP%%data/config.js?v=20260920d"></script>
-<script src="%%UP%%data/reports.js?v=20260920d"></script>
-<script src="%%UP%%data/store.js?v=20260920d"></script>
+<script src="%%UP%%data/config.js?v=20260922a"></script>
+<script src="%%UP%%data/reports.js?v=20260922a"></script>
+<script src="%%UP%%data/store.js?v=20260922a"></script>
 <script>
 (function(){
   var slug=document.querySelector('meta[name="pn:slug"]').content;

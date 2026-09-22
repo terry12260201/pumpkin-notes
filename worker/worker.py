@@ -286,7 +286,9 @@ def reskin_v03(html, slug_db, data, meta, shelf):
               "tags": [f"主題/{t}" for t in data["tags"].get("topic", [])[:3]] + [f"用途/{data['tags'].get('use','')}"],
               "shelf": shelf, "section": ""}
         m = B.scan_report(html)
-        out = B.reskin_report(html, rp, [rp], m, {shelf: shelf}, {}, depth_prefix=SITE)
+        try: names = {s["id"]: s["name"] for s in sb("GET", "/rest/v1/shelves?select=id,name")}
+        except Exception: names = {}
+        out = B.reskin_report(html, rp, [rp], m, {shelf: names.get(shelf, shelf)}, {}, depth_prefix=SITE)
         if not out: raise RuntimeError("reskin 回空")
         out = re.sub(r'name="pn:slug" content="[^"]*"', f'name="pn:slug" content="{slug_db}"', out)
         out = re.sub(r"var slug\s*=\s*['\"][^'\"]*['\"]", f"var slug='{slug_db}'", out)
